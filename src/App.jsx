@@ -467,11 +467,21 @@ function App() {
                         return (
                           <motion.div
                             key={task.id}
-                            whileHover={{
-                              scale: 1.02,
-                            }}
-                            className={`schedule-block ${categoryColor.color} rounded-lg p-3 flex-1 min-w-0 relative group`}
+                            layout
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            whileHover={{ scale: 1.02 }}
+                            className={`
+                                schedule-block
+                                ${categoryColor.color}
+                                ${task.completed ? 'opacity-70 saturate-50' : ''}
+                                rounded-lg p-3 flex-1 min-w-0 relative group
+                                transition-all duration-300
+                              `}
                           >
+                            
                             <div className="flex items-center justify-between">
                               {/* New completion button (left of content) */}
                               <div className="mr-3">
