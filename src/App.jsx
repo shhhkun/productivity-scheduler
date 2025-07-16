@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from '@/components/ui/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import Modal from '@/components/ui/modal';
-import CompleteButton from './components/ui/completebutton';
+import CompleteButton from '@/components/ui/completebutton';
+import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
 
 const COLORS = [
   {
@@ -54,6 +55,18 @@ function App() {
     description: '',
   });
   const formRef = useRef(null); // create form reference
+
+  // XP and Streak states
+  const [xp, setXp] = useState(0);
+  const [level, setLevel] = useState(1);
+  const [streak, setStreak] = useState(0);
+  const [lastCompletedDate, setLastCompletedDate] = useState(null);
+
+  // Update level based on current XP
+  useEffect(() => {
+    const newLevel = Math.floor(xp / 50) + 1;
+    setLevel(newLevel);
+  }, [xp]);
 
   // Update clock every second
   useEffect(() => {
@@ -190,11 +203,52 @@ function App() {
   };
 
   const toggleTaskCompletion = (taskId) => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
-    );
+    setTasks((prevTasks) => {
+      return prevTasks.map((task) => {
+        if (task.id === taskId) {
+          const newCompletedState = !task.completed;
+
+          // Adjust XP based on toggle state
+          if (newCompletedState && !task.completed) {
+            setXp((prevXp) => prevXp + 10); // Add XP when completing
+          } else if (!newCompletedState && task.completed) {
+            setXp((prevXp) => Math.max(prevXp - 10, 0)); // Subtract XP when unchecking, never below 0
+          }
+
+          return { ...task, completed: newCompletedState };
+        }
+        return task;
+      });
+    });
+  };
+
+  const updateXpAndStreak = () => {
+    const now = new Date();
+    const todayStr = now.toDateString();
+
+    if (lastCompletedDate) {
+      const lastDate = new Date(lastCompletedDate);
+      const diffDays = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 1) {
+        setStreak((prev) => prev + 1);
+      } else if (diffDays > 1) {
+        setStreak(1); // streak reset
+      }
+      // if same day, no streak change
+    } else {
+      setStreak(1); // first completion ever
+    }
+
+    setLastCompletedDate(todayStr);
+
+    // XP system
+    setXp((prevXp) => {
+      const newXp = prevXp + 10; // gain 10 XP per task
+      const newLevel = Math.floor(newXp / 100) + 1;
+      setLevel(newLevel);
+      return newXp;
+    });
   };
 
   const getTasksForTimeSlot = (time) => {
@@ -240,6 +294,11 @@ function App() {
             </div>
             <div className="text-gray-400 text-lg">
               {formatDate(currentTime)}
+            </div>
+
+            {/* New XP/Streak component here */}
+            <div className="mt-4 flex justify-center">
+              <XpStreakDisplay xp={xp} level={level} streak={streak} />
             </div>
           </div>
 
@@ -481,7 +540,6 @@ function App() {
                                 transition-all duration-300
                               `}
                           >
-                            
                             <div className="flex items-center justify-between">
                               {/* New completion button (left of content) */}
                               <div className="mr-3">
