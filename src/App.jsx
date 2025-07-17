@@ -43,6 +43,18 @@ const COLORS = [
   },
 ];
 
+function getLevelXpInfo(xp, level) {
+  const xpForCurrentLevel = (level - 1) * 100;
+  const xpForNextLevel = level * 100;
+  const xpToNextLevel = xpForNextLevel - xp;
+  const levelProgress = ((xp - xpForCurrentLevel) / 100) * 100;
+
+  return {
+    xpToNextLevel,
+    levelProgress: Math.max(0, Math.min(levelProgress, 100)),
+  };
+}
+
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tasks, setTasks] = useState([]);
@@ -223,6 +235,8 @@ function App() {
     });
   };
 
+  {
+    /*}
   const updateXpAndStreak = () => {
     const now = new Date();
     const todayStr = now.toDateString();
@@ -251,6 +265,8 @@ function App() {
       return newXp;
     });
   };
+  */
+  }
 
   const getTasksForTimeSlot = (time) => {
     return tasks.filter((task) => {
@@ -267,6 +283,8 @@ function App() {
   const timeSlots = generateTimeSlots();
 
   const completedCount = tasks.filter((task) => task.completed).length; // count completed tasks
+
+  const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -625,18 +643,33 @@ function App() {
         </motion.div>
       </div>
 
-      {/*Sticky XP/Streak Display*/}
       {/* Sticky XP/Streak/Badge Display */}
       <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 border-t border-gray-700 shadow-inner px-4 py-3">
-        <div className="flex flex-col items-center gap-1">
-          <XpStreakDisplay xp={xp} level={level} streak={streak} />
-          <BadgeDisplay
-            completedCount={
-              process.env.NODE_ENV === 'development'
-                ? level
-                : tasks.filter((t) => t.completed).length
-            }
-          />
+        <div className="relative flex items-center justify-between w-full min-h-[72px]">
+          {/* Left: Badge */}
+          <div className="flex items-center h-full">
+            <BadgeDisplay
+              completedCount={
+                process.env.NODE_ENV === 'development'
+                  ? level
+                  : tasks.filter((t) => t.completed).length
+              }
+            />
+          </div>
+
+          {/* Center: XP & Streak */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+            <XpStreakDisplay
+              xp={xp}
+              level={level}
+              xpToNextLevel={xpToNextLevel}
+              levelProgress={levelProgress}
+              streak={streak}
+            />
+          </div>
+
+          {/* Right: empty */}
+          <div className="w-[64px] h-full" />
         </div>
       </div>
 
