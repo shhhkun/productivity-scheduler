@@ -33,7 +33,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 ## Roadmap
 
 - [x] Sticky XP bar w/ responsive layout
-- [ ] Achievements & title system (e.g., “Task Apprentice”)
+- [x] Achievements & title system (e.g., “Task Apprentice”)
 - [ ] Task history or log view
 - [ ] Optional streak mechanic modes (daily, 3-day/week, etc.)
 - [ ] Animation polish (reduce layout shift on reordering)

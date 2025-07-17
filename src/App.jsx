@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Modal from '@/components/ui/modal';
 import CompleteButton from '@/components/ui/completebutton';
 import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
+import BadgeDisplay from './components/ui/badgedisplay';
 
 const COLORS = [
   {
@@ -264,6 +265,8 @@ function App() {
   };
 
   const timeSlots = generateTimeSlots();
+
+  const completedCount = tasks.filter((task) => task.completed).length; // count completed tasks
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -623,11 +626,28 @@ function App() {
       </div>
 
       {/*Sticky XP/Streak Display*/}
+      {/* Sticky XP/Streak/Badge Display */}
       <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 border-t border-gray-700 shadow-inner px-4 py-3">
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-1">
           <XpStreakDisplay xp={xp} level={level} streak={streak} />
+          <BadgeDisplay
+            completedCount={
+              process.env.NODE_ENV === 'development'
+                ? level
+                : tasks.filter((t) => t.completed).length
+            }
+          />
         </div>
       </div>
+
+      {process.env.NODE_ENV === 'development' && (
+        <button
+          onClick={() => setXp(xp + 5 * 50)} // 50 XP per level
+          className="fixed top-4 right-4 bg-purple-700 text-white px-4 py-2 rounded shadow-lg hover:bg-purple-800 z-50"
+        >
+          +5 Levels XP
+        </button>
+      )}
 
       <Toaster />
     </div>
