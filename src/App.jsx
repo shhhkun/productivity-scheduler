@@ -89,7 +89,7 @@ function App() {
   }, [xp]);
 
   // Update clock every second
-  useEffect(() => { 
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -309,9 +309,31 @@ function App() {
 
   return (
     <>
-      {showConfetti && <Confetti width={width} height={height} />}
+      <AnimatePresence>
+        {showConfetti && (
+          <motion.div
+            key="confetti"
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              pointerEvents: 'none',
+              overflow: 'hidden',
+              zIndex: 1000, // ensure confetti is on top
+            }}
+          >
+            <Confetti width={width} height={height} />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="min-h-screen bg-gray-900 text-gray-100">
+      <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
         <Helmet>
           <title>Productivity Scheduler - Organize Your Day</title>
           <meta
