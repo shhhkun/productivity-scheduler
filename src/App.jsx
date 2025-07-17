@@ -274,8 +274,7 @@ function App() {
           content="A beautiful, minimalistic productivity scheduler with color-coded blocks to help you organize your daily tasks and activities."
         />
       </Helmet>
-
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 pb-28">
         {/* Header with Clock */}
         <motion.div
           initial={{
@@ -294,11 +293,6 @@ function App() {
             </div>
             <div className="text-gray-400 text-lg">
               {formatDate(currentTime)}
-            </div>
-
-            {/* New XP/Streak component here */}
-            <div className="mt-4 flex justify-center">
-              <XpStreakDisplay xp={xp} level={level} streak={streak} />
             </div>
           </div>
 
@@ -627,6 +621,14 @@ function App() {
           </div>
         </motion.div>
       </div>
+
+      {/*Sticky XP/Streak Display*/}
+      <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 border-t border-gray-700 shadow-inner px-4 py-3">
+        <div className="flex justify-center">
+          <XpStreakDisplay xp={xp} level={level} streak={streak} />
+        </div>
+      </div>
+
       <Toaster />
     </div>
   );
