@@ -13,6 +13,7 @@ import Confetti from 'react-confetti';
 import { useWindowSize } from './hooks/usewindowsize';
 import RankBadge from './components/ui/rankbadge';
 import DebugMenu from './components/ui/debugmenu';
+import DaySelectorBar from './components/ui/dayselectorbar';
 
 const COLORS = [
   {
@@ -101,6 +102,9 @@ function App() {
 
   // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
   const xpForLevel = (level) => 100 + (level - 1) * 20;
+
+  // day selector state (for 7-day window topbar)
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Update level based on current XP (100 XP per level)
   useEffect(() => {
@@ -626,6 +630,9 @@ function App() {
               </div>
             </>
           </Modal>
+
+          {/* Day Selector Bar */}
+          <DaySelectorBar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
 
           {/* Schedule Grid */}
           <div className="glass-effect rounded-2xl p-6">
