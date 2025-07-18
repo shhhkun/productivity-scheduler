@@ -61,3 +61,17 @@ body {
   font-family: 'JetBrains Mono', 'Courier New', monospace;
   text-shadow: 0 0 10px rgba(167, 243, 208, 0.5);
 }
+
+/* Glow effects for tiered badges */
+.glow-bronze {
+  text-shadow: 0 0 5px #c97833;
+}
+.glow-silver {
+  text-shadow: 0 0 6px #cccccc;
+}
+.glow-gold {
+  text-shadow: 0 0 7px #ffd700;
+}
+.glow-plat {
+  text-shadow: 0 0 8px #a0e6ff;
+}

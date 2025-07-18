@@ -1,7 +1,7 @@
 import React from 'react';
 
-export default function XpStreakDisplay({ xp, level, xpToNextLevel, streak }) {
-  const xpPercent = Math.min(100, Math.floor((xp / xpToNextLevel) * 100));
+export default function XpStreakDisplay({ xp, level, xpToNextLevel, levelProgress, streak }) {
+  const xpPercent = levelProgress;
 
   return (
     <div className="flex flex-col space-y-2 px-4 py-3 bg-slate-900 bg-opacity-70 rounded-lg glow w-full max-w-md">

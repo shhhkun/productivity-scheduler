@@ -11,6 +11,7 @@ import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
 import BadgeDisplay from './components/ui/badgedisplay';
 import Confetti from 'react-confetti';
 import { useWindowSize } from './hooks/usewindowsize';
+import RankBadge from './components/ui/rankbadge';
 
 const COLORS = [
   {
@@ -46,14 +47,26 @@ const COLORS = [
 ];
 
 function getLevelXpInfo(xp, level) {
-  const xpForCurrentLevel = (level - 1) * 100;
-  const xpForNextLevel = level * 100;
+  // Cumulative XP to reach a level
+  const getTotalXpForLevel = (lvl) => {
+    let total = 0;
+    for (let i = 1; i < lvl; i++) {
+      total += 100 + (i - 1) * 20;
+    }
+    return total;
+  };
+
+  const xpForCurrentLevel = getTotalXpForLevel(level);
+  const xpForNextLevel = getTotalXpForLevel(level + 1);
+
   const xpToNextLevel = xpForNextLevel - xp;
-  const levelProgress = ((xp - xpForCurrentLevel) / 100) * 100;
+  const levelProgress = ((xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
+  const currentXpInLevel = xp - xpForCurrentLevel;
 
   return {
     xpToNextLevel,
     levelProgress: Math.max(0, Math.min(levelProgress, 100)),
+    currentXpInLevel,
   };
 }
 
@@ -78,14 +91,27 @@ function App() {
   //const [lastCompletedDate, setLastCompletedDate] = useState(null);
 
   const { width, height } = useWindowSize();
-  //const width = window.innerWidth;
-  //const height = window.innerHeight;
   const [showConfetti, setShowConfetti] = useState(false);
 
-  // Update level based on current XP
+  // rank badge states for tier and rank up animation
+  const [currentTier, setCurrentTier] = useState('');
+  const [rankUp, setRankUp] = useState(false);
+
+  // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
+  const xpForLevel = (level) => 100 + (level - 1) * 20;
+
+  // Update level based on current XP (100 XP per level)
   useEffect(() => {
-    const newLevel = Math.floor(xp / 50) + 1;
+    let newLevel = 1;
+    let remainingXp = xp;
+
+    while (remainingXp >= xpForLevel(newLevel)) {
+      remainingXp -= xpForLevel(newLevel);
+      newLevel++;
+    }
+
     setLevel(newLevel);
+    //setXpToNextLevel(xpForLevel(newLevel));
   }, [xp]);
 
   // Update clock every second
@@ -129,6 +155,30 @@ function App() {
     }
     prevLevel.current = level; // Also keep this for the else case (optional)
   }, [level]);
+
+  // badge/rank up effect
+  useEffect(() => {
+    const badgeLevels = [
+      { level: 'Bronze', threshold: 5 },
+      { level: 'Silver', threshold: 15 },
+      { level: 'Gold', threshold: 30 },
+      { level: 'Platinum', threshold: 50 },
+      { level: 'Diamond', threshold: 75 },
+      { level: 'Scheduler Sage', threshold: 100 },
+    ];
+
+    const newTier = badgeLevels.reduce((acc, badge) => {
+      return level >= badge.threshold ? badge.level : acc;
+    }, '');
+
+    if (newTier !== currentTier) {
+      setCurrentTier(newTier);
+      setRankUp(true);
+
+      const timer = setTimeout(() => setRankUp(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [level]); // 👈 correct tracked value
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
@@ -244,9 +294,9 @@ function App() {
 
           // Adjust XP based on toggle state
           if (newCompletedState && !task.completed) {
-            setXp((prevXp) => prevXp + 10); // Add XP when completing
+            setXp((prevXp) => prevXp + 20); // Add XP when completing
           } else if (!newCompletedState && task.completed) {
-            setXp((prevXp) => Math.max(prevXp - 10, 0)); // Subtract XP when unchecking, never below 0
+            setXp((prevXp) => Math.max(prevXp - 20, 0)); // Subtract XP when unchecking, never below 0
           }
 
           return { ...task, completed: newCompletedState };
@@ -695,6 +745,7 @@ function App() {
         <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 border-t border-gray-700 shadow-inner px-4 py-3">
           <div className="relative flex items-center justify-between w-full min-h-[72px]">
             {/* Left: Badge */}
+            {/*
             <div className="flex items-center h-full">
               <BadgeDisplay
                 completedCount={
@@ -703,6 +754,11 @@ function App() {
                     : tasks.filter((t) => t.completed).length
                 }
               />
+            </div>
+            */}
+
+            <div className="flex items-center h-full">
+              <RankBadge tier={currentTier} show={rankUp} />
             </div>
 
             {/* Center: XP & Streak */}
@@ -723,10 +779,10 @@ function App() {
 
         {process.env.NODE_ENV === 'development' && (
           <button
-            onClick={() => setXp(xp + 5 * 50)} // 50 XP per level
+            onClick={() => setXp(xp + 500)} // dynamic XP per level
             className="fixed top-4 right-4 bg-purple-700 text-white px-4 py-2 rounded shadow-lg hover:bg-purple-800 z-50"
           >
-            +5 Levels XP
+            +500XP
           </button>
         )}
 
