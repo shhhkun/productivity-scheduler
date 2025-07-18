@@ -43,6 +43,13 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 
 ---
 
+## Known Bugs/Issues
+
+- Rank up notification will sometimes persist/stay
+    - Potential Cause(s): large influx of XP at once, de-leveling
+- Streak counter stuck at 0 days
+    - will be fixed later on once multiday scheduling is implemented
+
 ## Notes
 
 - XP/streak logic currently only updates on task checkmarks.
