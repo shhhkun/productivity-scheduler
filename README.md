@@ -55,6 +55,9 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - XP/streak logic currently only updates on task checkmarks.
 - Streak logic tied to calendar day rollover — better UX needed.
 - Animation tuning ongoing (e.g., card bounce, modal scale)
+- Refactorable code later on:
+    - rankbadge.jsx and badgedisplay.jsx were refactored, possibly remove badgedisplay later on
+    - level states and event handlers
 
 ---
 

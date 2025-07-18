@@ -12,6 +12,7 @@ import BadgeDisplay from './components/ui/badgedisplay';
 import Confetti from 'react-confetti';
 import { useWindowSize } from './hooks/usewindowsize';
 import RankBadge from './components/ui/rankbadge';
+import DebugMenu from './components/ui/debugmenu';
 
 const COLORS = [
   {
@@ -60,7 +61,8 @@ function getLevelXpInfo(xp, level) {
   const xpForNextLevel = getTotalXpForLevel(level + 1);
 
   const xpToNextLevel = xpForNextLevel - xp;
-  const levelProgress = ((xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
+  const levelProgress =
+    ((xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
   const currentXpInLevel = xp - xpForCurrentLevel;
 
   return {
@@ -756,7 +758,6 @@ function App() {
               />
             </div>
             */}
-
             <div className="flex items-center h-full">
               <RankBadge tier={currentTier} show={rankUp} />
             </div>
@@ -777,14 +778,16 @@ function App() {
           </div>
         </div>
 
-        {process.env.NODE_ENV === 'development' && (
-          <button
-            onClick={() => setXp(xp + 500)} // dynamic XP per level
-            className="fixed top-4 right-4 bg-purple-700 text-white px-4 py-2 rounded shadow-lg hover:bg-purple-800 z-50"
-          >
-            +500XP
-          </button>
-        )}
+        {/* Debug Menu for all sorts of things */}
+        <DebugMenu
+          addXP={(amount) => setXp((prev) => prev + amount)}
+          resetProgress={() => {
+            setXp(0);
+            setLevel(1);
+            setBadges([]);
+            localStorage.clear();
+          }}
+        />
 
         <Toaster />
       </div>

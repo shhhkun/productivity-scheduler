@@ -75,3 +75,18 @@ body {
 .glow-plat {
   text-shadow: 0 0 8px #a0e6ff;
 }
+
+/* Debug menu button */
+.debug-button {
+  background: #333;
+  color: #ccc;
+  border: 1px solid #555;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.debug-button:hover {
+  background: #444;
+}
