@@ -97,7 +97,7 @@ function App() {
 
   // rank badge states for tier and rank up animation
   const [currentTier, setCurrentTier] = useState('');
-  const [rankUp, setRankUp] = useState(false);
+  //const [rankUp, setRankUp] = useState(false);
 
   // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
   const xpForLevel = (level) => 100 + (level - 1) * 20;
@@ -159,6 +159,42 @@ function App() {
   }, [level]);
 
   // badge/rank up effect
+  {/*const rankTimeoutRef = useRef(null); // avoid stale state/timer not being timed out
+  useEffect(() => {
+    const badgeLevels = [
+      { level: 'Bronze', threshold: 5 },
+      { level: 'Silver', threshold: 15 },
+      { level: 'Gold', threshold: 30 },
+      { level: 'Platinum', threshold: 50 },
+      { level: 'Diamond', threshold: 75 },
+      { level: 'Scheduler Sage', threshold: 100 },
+    ];
+
+    const newTier = badgeLevels.reduce((acc, badge) => {
+      return level >= badge.threshold ? badge.level : acc;
+    }, '');
+
+    if (newTier && newTier !== currentTier) {
+      setCurrentTier(newTier);
+      setRankUp(true);
+
+      if (rankTimeoutRef.current) {
+        clearTimeout(rankTimeoutRef.current);
+      }
+
+      rankTimeoutRef.current = setTimeout(() => {
+        setRankUp(false);
+        rankTimeoutRef.current = null;
+      }, 2500);
+    }
+
+    return () => {
+      if (rankTimeoutRef.current) {
+        clearTimeout(rankTimeoutRef.current);
+      }
+    };
+  }, [level]);*/}
+
   useEffect(() => {
     const badgeLevels = [
       { level: 'Bronze', threshold: 5 },
@@ -175,12 +211,8 @@ function App() {
 
     if (newTier !== currentTier) {
       setCurrentTier(newTier);
-      setRankUp(true);
-
-      const timer = setTimeout(() => setRankUp(false), 2500);
-      return () => clearTimeout(timer);
     }
-  }, [level]); // 👈 correct tracked value
+  }, [level]);
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
@@ -260,9 +292,9 @@ function App() {
       prev.map((task) =>
         task.id === editingTask
           ? {
-              ...newTask,
-              id: editingTask,
-            }
+            ...newTask,
+            id: editingTask,
+          }
           : task
       )
     );
@@ -313,11 +345,11 @@ function App() {
   const updateXpAndStreak = () => {
     const now = new Date();
     const todayStr = now.toDateString();
-
+  
     if (lastCompletedDate) {
       const lastDate = new Date(lastCompletedDate);
       const diffDays = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
-
+  
       if (diffDays === 1) {
         setStreak((prev) => prev + 1);
       } else if (diffDays > 1) {
@@ -327,9 +359,9 @@ function App() {
     } else {
       setStreak(1); // first completion ever
     }
-
+  
     setLastCompletedDate(todayStr);
-
+  
     // XP system
     setXp((prevXp) => {
       const newXp = prevXp + 10; // gain 10 XP per task
@@ -759,7 +791,7 @@ function App() {
             </div>
             */}
             <div className="flex items-center h-full">
-              <RankBadge tier={currentTier} show={rankUp} />
+              <RankBadge tier={currentTier} />
             </div>
 
             {/* Center: XP & Streak */}
@@ -784,6 +816,7 @@ function App() {
           resetProgress={() => {
             setXp(0);
             setLevel(1);
+            setCurrentTier('');
             setBadges([]);
             localStorage.clear();
           }}

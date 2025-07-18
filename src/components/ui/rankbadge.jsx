@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -19,7 +20,33 @@ const tierTitles = {
   'Scheduler Sage': 'Sage',
 };
 
-export default function RankBadge({ tier, show }) {
+export default function RankBadge({ tier }) {
+  const [showRankUp, setShowRankUp] = useState(false);
+  const prevTier = useRef(null);
+  const timerRef = useRef(null);
+
+  useEffect(() => {
+    if (tier && tier !== prevTier.current) {
+      setShowRankUp(true);
+
+      // Clear any existing timeout
+      if (timerRef.current) clearTimeout(timerRef.current);
+
+      timerRef.current = setTimeout(() => {
+        setShowRankUp(false);
+        timerRef.current = null;
+      }, 2500);
+
+      prevTier.current = tier;
+    }
+  }, [tier]);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
   const style = tierStyles[tier] || 'text-white';
   const title = tierTitles[tier] || '';
 
@@ -27,7 +54,7 @@ export default function RankBadge({ tier, show }) {
     <div className="relative flex flex-col items-center justify-center">
       {/* Animated "Rank Up!" Notification */}
       <AnimatePresence>
-        {show && (
+        {showRankUp && (
           <motion.div
             key="rank-up-toast"
             initial={{ opacity: 0, scale: 0.8, y: 10 }}
@@ -48,9 +75,9 @@ export default function RankBadge({ tier, show }) {
           'px-4 py-2 rounded-full border font-semibold shadow-sm text-sm text-center',
           style
         )}
-        initial={show ? { scale: 0.8, opacity: 0 } : false}
-        animate={show ? { scale: 1.1, opacity: 1 } : false}
-        exit={show ? { scale: 0.8, opacity: 0 } : false}
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1.1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
       >
         {tier}
