@@ -75,7 +75,7 @@ function getLevelXpInfo(xp, level) {
 
 function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState({});
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [newTask, setNewTask] = useState({
@@ -105,6 +105,23 @@ function App() {
 
   // day selector state (for 7-day window topbar)
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [tasksByDate, setTasksByDate] = useState({});
+
+  // format selected date for comparison (YYYY-MM-DD)
+  const selectedDateString = selectedDate.toISOString().split('T')[0];
+
+  // filter tasks for this date
+  const tasksForSelectedDate = tasks[selectedDateString] || [];
+
+  // load/save per-day task storage
+  useEffect(() => {
+    const saved = localStorage.getItem('tasksByDate');
+    if (saved) setTasksByDate(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('tasksByDate', JSON.stringify(tasksByDate));
+  }, [tasksByDate]);
 
   // Update level based on current XP (100 XP per level)
   useEffect(() => {
@@ -264,14 +281,22 @@ function App() {
       return;
     }
 
+    const dateKey = selectedDateString; // <- Use your new selected day state
     const task = {
       id: Date.now(),
       ...newTask,
-      date: new Date().toISOString().split('T')[0],
-      completed: false, // checkbox field/state variable
+      date: dateKey,
+      completed: false,
     };
 
-    setTasks((prev) => [...prev, task]);
+    setTasks((prevTasks) => {
+      const updatedTasksForDate = [...(prevTasks[dateKey] || []), task];
+      return {
+        ...prevTasks,
+        [dateKey]: updatedTasksForDate,
+      };
+    });
+
     setNewTask({
       title: '',
       startTime: '',
@@ -292,16 +317,19 @@ function App() {
   };
 
   const handleUpdateTask = () => {
-    setTasks((prev) =>
-      prev.map((task) =>
-        task.id === editingTask
-          ? {
-            ...newTask,
-            id: editingTask,
-          }
-          : task
-      )
-    );
+    const dateKey = selectedDateString;
+
+    setTasks((prevTasks) => {
+      const updatedTasksForDate = prevTasks[dateKey].map((task) =>
+        task.id === editingTask ? { ...newTask, id: editingTask } : task
+      );
+
+      return {
+        ...prevTasks,
+        [dateKey]: updatedTasksForDate,
+      };
+    });
+
     setEditingTask(null);
     setNewTask({
       title: '',
@@ -310,6 +338,7 @@ function App() {
       category: 'Work',
       description: '',
     });
+
     toast({
       title: 'Task Updated',
       description: 'Your task has been successfully updated!',
@@ -317,7 +346,15 @@ function App() {
   };
 
   const handleDeleteTask = (taskId) => {
-    setTasks((prev) => prev.filter((task) => task.id !== taskId));
+    setTasks((prevTasks) => {
+      const dateKey = selectedDateString;
+      const updatedDateTasks = prevTasks[dateKey].filter((task) => task.id !== taskId);
+      return {
+        ...prevTasks,
+        [dateKey]: updatedDateTasks,
+      };
+    });
+
     toast({
       title: 'Task Deleted',
       description: 'Task has been removed from your schedule.',
@@ -326,63 +363,33 @@ function App() {
 
   const toggleTaskCompletion = (taskId) => {
     setTasks((prevTasks) => {
-      return prevTasks.map((task) => {
+      const dateKey = selectedDateString;
+      const updatedDateTasks = prevTasks[dateKey].map((task) => {
         if (task.id === taskId) {
           const newCompletedState = !task.completed;
 
-          // Adjust XP based on toggle state
           if (newCompletedState && !task.completed) {
-            setXp((prevXp) => prevXp + 20); // Add XP when completing
+            setXp((prevXp) => prevXp + 20);
           } else if (!newCompletedState && task.completed) {
-            setXp((prevXp) => Math.max(prevXp - 20, 0)); // Subtract XP when unchecking, never below 0
+            setXp((prevXp) => Math.max(prevXp - 20, 0));
           }
 
           return { ...task, completed: newCompletedState };
         }
         return task;
       });
-    });
-  };
 
-  {
-    /*}
-  const updateXpAndStreak = () => {
-    const now = new Date();
-    const todayStr = now.toDateString();
-  
-    if (lastCompletedDate) {
-      const lastDate = new Date(lastCompletedDate);
-      const diffDays = Math.floor((now - lastDate) / (1000 * 60 * 60 * 24));
-  
-      if (diffDays === 1) {
-        setStreak((prev) => prev + 1);
-      } else if (diffDays > 1) {
-        setStreak(1); // streak reset
-      }
-      // if same day, no streak change
-    } else {
-      setStreak(1); // first completion ever
-    }
-  
-    setLastCompletedDate(todayStr);
-  
-    // XP system
-    setXp((prevXp) => {
-      const newXp = prevXp + 10; // gain 10 XP per task
-      const newLevel = Math.floor(newXp / 100) + 1;
-      setLevel(newLevel);
-      return newXp;
+      return {
+        ...prevTasks,
+        [dateKey]: updatedDateTasks,
+      };
     });
   };
-  */
-  }
 
   const getTasksForTimeSlot = (time) => {
-    return tasks.filter((task) => {
-      const taskStart = task.startTime;
-      const taskEnd = task.endTime;
-      return time >= taskStart && time < taskEnd;
-    });
+    return tasksForSelectedDate.filter(
+      (task) => task.startTime === time
+    );
   };
 
   const getCategoryColor = (category) => {
@@ -391,7 +398,7 @@ function App() {
 
   const timeSlots = generateTimeSlots();
 
-  const completedCount = tasks.filter((task) => task.completed).length; // count completed tasks
+  const completedCount = Object.values(tasks).flat().filter(task => task.completed).length; // count completed tasks
 
   const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
 
@@ -633,6 +640,7 @@ function App() {
 
           {/* Day Selector Bar */}
           <DaySelectorBar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
+
 
           {/* Schedule Grid */}
           <div className="glass-effect rounded-2xl p-6">
