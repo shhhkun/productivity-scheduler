@@ -8,7 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Modal from '@/components/ui/modal';
 import CompleteButton from '@/components/ui/completebutton';
 import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
-import BadgeDisplay from './components/ui/badgedisplay';
+//import BadgeDisplay from './components/ui/badgedisplay';
 import Confetti from 'react-confetti';
 import { useWindowSize } from './hooks/usewindowsize';
 import RankBadge from './components/ui/rankbadge';
@@ -91,14 +91,12 @@ function App() {
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
   const [streak, setStreak] = useState(0);
-  //const [lastCompletedDate, setLastCompletedDate] = useState(null);
 
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = useState(false);
 
   // rank badge states for tier and rank up animation
   const [currentTier, setCurrentTier] = useState('');
-  //const [rankUp, setRankUp] = useState(false);
 
   // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
   const xpForLevel = (level) => 100 + (level - 1) * 20;
@@ -123,7 +121,7 @@ function App() {
     localStorage.setItem('tasksByDate', JSON.stringify(tasksByDate));
   }, [tasksByDate]);
 
-  // Update level based on current XP (100 XP per level)
+  // update level based on current XP (100 XP per level)
   useEffect(() => {
     let newLevel = 1;
     let remainingXp = xp;
@@ -137,7 +135,7 @@ function App() {
     //setXpToNextLevel(xpForLevel(newLevel));
   }, [xp]);
 
-  // Update clock every second
+  // update clock every second
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
@@ -145,7 +143,7 @@ function App() {
     return () => clearInterval(timer);
   }, []);
 
-  // Load tasks from localStorage
+  // load tasks from localStorage
   useEffect(() => {
     const savedTasks = localStorage.getItem('scheduler-tasks');
     if (savedTasks) {
@@ -153,12 +151,12 @@ function App() {
     }
   }, []);
 
-  // Save tasks to localStorage
+  // save tasks to localStorage
   useEffect(() => {
     localStorage.setItem('scheduler-tasks', JSON.stringify(tasks));
   }, [tasks]);
 
-  // If opening form, scroll form into view (helps if scroll bar pushes form out of view)
+  // if opening form, scroll form into view (helps if scroll bar pushes form out of view)
   useEffect(() => {
     if ((isAddingTask || editingTask) && formRef.current) {
       formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -172,50 +170,14 @@ function App() {
       setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 4000);
 
-      prevLevel.current = level; // Move this here so it updates BEFORE returning cleanup
+      prevLevel.current = level; // move this here so it updates BEFORE returning cleanup
 
       return () => clearTimeout(timer);
     }
-    prevLevel.current = level; // Also keep this for the else case (optional)
+    prevLevel.current = level; // keep this for the else case (optional)
   }, [level]);
 
   // badge/rank up effect
-  {/*const rankTimeoutRef = useRef(null); // avoid stale state/timer not being timed out
-  useEffect(() => {
-    const badgeLevels = [
-      { level: 'Bronze', threshold: 5 },
-      { level: 'Silver', threshold: 15 },
-      { level: 'Gold', threshold: 30 },
-      { level: 'Platinum', threshold: 50 },
-      { level: 'Diamond', threshold: 75 },
-      { level: 'Scheduler Sage', threshold: 100 },
-    ];
-
-    const newTier = badgeLevels.reduce((acc, badge) => {
-      return level >= badge.threshold ? badge.level : acc;
-    }, '');
-
-    if (newTier && newTier !== currentTier) {
-      setCurrentTier(newTier);
-      setRankUp(true);
-
-      if (rankTimeoutRef.current) {
-        clearTimeout(rankTimeoutRef.current);
-      }
-
-      rankTimeoutRef.current = setTimeout(() => {
-        setRankUp(false);
-        rankTimeoutRef.current = null;
-      }, 2500);
-    }
-
-    return () => {
-      if (rankTimeoutRef.current) {
-        clearTimeout(rankTimeoutRef.current);
-      }
-    };
-  }, [level]);*/}
-
   useEffect(() => {
     const badgeLevels = [
       { level: 'Bronze', threshold: 5 },
@@ -348,7 +310,9 @@ function App() {
   const handleDeleteTask = (taskId) => {
     setTasks((prevTasks) => {
       const dateKey = selectedDateString;
-      const updatedDateTasks = prevTasks[dateKey].filter((task) => task.id !== taskId);
+      const updatedDateTasks = prevTasks[dateKey].filter(
+        (task) => task.id !== taskId
+      );
       return {
         ...prevTasks,
         [dateKey]: updatedDateTasks,
@@ -387,9 +351,14 @@ function App() {
   };
 
   const getTasksForTimeSlot = (time) => {
-    return tasksForSelectedDate.filter(
-      (task) => task.startTime === time
-    );
+    const slotHour = parseInt(time.split(':')[0], 10);
+
+    return tasksForSelectedDate.filter((task) => {
+      const startHour = parseInt(task.startTime.split(':')[0], 10);
+      const endHour = parseInt(task.endTime.split(':')[0], 10);
+
+      return slotHour >= startHour && slotHour < endHour;
+    });
   };
 
   const getCategoryColor = (category) => {
@@ -398,7 +367,9 @@ function App() {
 
   const timeSlots = generateTimeSlots();
 
-  const completedCount = Object.values(tasks).flat().filter(task => task.completed).length; // count completed tasks
+  const completedCount = Object.values(tasks)
+    .flat()
+    .filter((task) => task.completed).length; // count completed tasks
 
   const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
 
@@ -639,8 +610,10 @@ function App() {
           </Modal>
 
           {/* Day Selector Bar */}
-          <DaySelectorBar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-
+          <DaySelectorBar
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
 
           {/* Schedule Grid */}
           <div className="glass-effect rounded-2xl p-6">
@@ -794,17 +767,6 @@ function App() {
         <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 border-t border-gray-700 shadow-inner px-4 py-3">
           <div className="relative flex items-center justify-between w-full min-h-[72px]">
             {/* Left: Badge */}
-            {/*
-            <div className="flex items-center h-full">
-              <BadgeDisplay
-                completedCount={
-                  process.env.NODE_ENV === 'development'
-                    ? level
-                    : tasks.filter((t) => t.completed).length
-                }
-              />
-            </div>
-            */}
             <div className="flex items-center h-full">
               <RankBadge tier={currentTier} />
             </div>
@@ -825,7 +787,7 @@ function App() {
           </div>
         </div>
 
-        {/* Debug Menu for all sorts of things */}
+        {/* Debug Menu: for all sorts of things */}
         <DebugMenu
           addXP={(amount) => setXp((prev) => prev + amount)}
           resetProgress={() => {
