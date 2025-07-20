@@ -21,12 +21,21 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - UI polish for XP display
 - Refactored task state handlers for clarity
 
-### **v1.2 – Upcoming**
-- Sticky XP bar (always visible, non-obtrusive)
-- Badge/achievement system brainstorm
-- Better streak logic (more flexible, less punishing)
-- Task categorization (daily, long-term, etc.)
+### **v1.2 – Ranks & Debugging**
+- Sticky XP bar (includes rank/badges, level bar, and XP info)
+- Badge/achievement system
+- Debug menu (supports XP system)
+- Rank/Level up animations
+
+### **v1.3 - Upcoming**
+- Scheduler Overhaul
+    - 7-day view window
+    - Calendar for adding tasks in advance/navigation
+    - Arrows for week navigation
+    - Change task storage system
 - Data persistence (localStorage or backend setup)
+- Task categorization
+- Better streak logic
 
 ---
 
