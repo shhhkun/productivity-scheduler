@@ -14,6 +14,7 @@ import { useWindowSize } from './hooks/usewindowsize';
 import RankBadge from './components/ui/rankbadge';
 import DebugMenu from './components/ui/debugmenu';
 import DaySelectorBar from './components/ui/dayselectorbar';
+import { addDays, subDays } from 'date-fns';
 
 const COLORS = [
   {
@@ -110,6 +111,9 @@ function App() {
 
   // filter tasks for this date
   const tasksForSelectedDate = tasks[selectedDateString] || [];
+
+  // point at first day of the 7-day window
+  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
   // load/save per-day task storage
   useEffect(() => {
@@ -373,6 +377,23 @@ function App() {
 
   const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
 
+  // week navigation handlers
+  const goToNextWeek = () => {
+    const nextWeek = addDays(currentWeekStart, 7);
+    setCurrentWeekStart(nextWeek);
+    setSelectedDate(nextWeek);
+  };
+
+  const goToPreviousWeek = () => {
+    const prevWeek = subDays(currentWeekStart, 7);
+    setCurrentWeekStart(prevWeek);
+    setSelectedDate(prevWeek);
+  };
+
+  const currentWeekDates = Array.from({ length: 7 }, (_, i) =>
+    addDays(currentWeekStart, i)
+  );
+
   return (
     <>
       <AnimatePresence>
@@ -609,11 +630,44 @@ function App() {
             </>
           </Modal>
 
-          {/* Day Selector Bar */}
-          <DaySelectorBar
-            selectedDate={selectedDate}
-            setSelectedDate={setSelectedDate}
-          />
+          {/* Day/Week Selector Bar */}
+          <div className="flex w-full items-center justify-between px-4">
+            {/* Left Arrow */}
+            <button
+              onClick={goToPreviousWeek}
+              style={{
+                backgroundColor: 'rgb(167, 243, 208)',
+                color: 'rgb(17, 24, 39)',
+                fontWeight: '600',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.75rem',
+              }}
+            >
+              ←
+            </button>
+
+            <div className="flex-1 mx-4">
+              <DaySelectorBar
+                selectedDate={selectedDate}
+                setSelectedDate={setSelectedDate}
+                currentWeekStart={currentWeekStart}
+              />
+            </div>
+
+            {/* Right Arrow */}
+            <button
+              onClick={goToNextWeek}
+              style={{
+                backgroundColor: 'rgb(167, 243, 208)',
+                color: 'rgb(17, 24, 39)',
+                fontWeight: '600',
+                padding: '0.5rem 1rem',
+                borderRadius: '0.75rem',
+              }}
+            >
+              →
+            </button>
+          </div>
 
           {/* Schedule Grid */}
           <div className="glass-effect rounded-2xl p-6">

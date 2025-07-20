@@ -1,8 +1,8 @@
 import React from 'react';
 import { format, addDays } from 'date-fns';
 
-export default function DaySelectorBar({ selectedDate, setSelectedDate }) {
-    const days = Array.from({ length: 7 }, (_, i) => addDays(new Date(), i));
+export default function DaySelectorBar({ selectedDate, setSelectedDate, currentWeekStart }) {
+    const days = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
     return (
         <div className="flex justify-between px-2 py-2 bg-gray-900 rounded-full mb-2 shadow-sm">
