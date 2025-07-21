@@ -15,6 +15,7 @@ import RankBadge from './components/ui/rankbadge';
 import DebugMenu from './components/ui/debugmenu';
 import DaySelectorBar from './components/ui/dayselectorbar';
 import { addDays, subDays } from 'date-fns';
+import CalendarPicker from './components/ui/calendarpicker';
 
 const COLORS = [
   {
@@ -75,6 +76,10 @@ function getLevelXpInfo(xp, level) {
 }
 
 function App() {
+  // day selector state (for 7-day window topbar)
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [tasksByDate, setTasksByDate] = useState({});
+
   const [currentTime, setCurrentTime] = useState(new Date());
   const [tasks, setTasks] = useState({});
   const [isAddingTask, setIsAddingTask] = useState(false);
@@ -85,6 +90,7 @@ function App() {
     endTime: '',
     category: 'Work',
     description: '',
+    date: selectedDate.toISOString().split('T')[0],
   });
   const formRef = useRef(null); // create form reference
 
@@ -102,10 +108,6 @@ function App() {
   // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
   const xpForLevel = (level) => 100 + (level - 1) * 20;
 
-  // day selector state (for 7-day window topbar)
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [tasksByDate, setTasksByDate] = useState({});
-
   // format selected date for comparison (YYYY-MM-DD)
   const selectedDateString = selectedDate.toISOString().split('T')[0];
 
@@ -114,6 +116,11 @@ function App() {
 
   // point at first day of the 7-day window
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+
+  // Use the parent's selectedDate as the default for the new task date.
+  const [taskDate, setTaskDate] = useState(new Date(selectedDate));
+  // Controls whether the calendar popover is shown.
+  const [showCalendar, setShowCalendar] = useState(false);
 
   // load/save per-day task storage
   useEffect(() => {
@@ -247,7 +254,9 @@ function App() {
       return;
     }
 
-    const dateKey = selectedDateString; // <- Use your new selected day state
+    //const dateKey = selectedDateString; // <- Use your new selected day state
+    const dateKey = taskDate.toISOString().split('T')[0];
+
     const task = {
       id: Date.now(),
       ...newTask,
@@ -495,6 +504,45 @@ function App() {
               >
                 {editingTask ? 'Edit Task' : 'Add New Task'}
               </h3>
+
+              {/* Calendar Date Picker */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-1">
+                  Task Date
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowCalendar((prev) => !prev)}
+                  className="w-full flex items-center justify-between bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 hover:border-[rgb(167,243,208)] transition-all"
+                >
+                  <span>{taskDate.toDateString()}</span>
+                  
+                  {/* calendar icon using SVG */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-[rgb(167,243,208)]"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M6 2a1 1 0 00-1 1v1H3.5A1.5 1.5 0 002 5.5v11A1.5 1.5 0 003.5 18h13a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0016.5 4H15V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM3.5 6h13a.5.5 0 01.5.5V8H3V6.5a.5.5 0 01.5-.5zm0 3h13v7.5a.5.5 0 01-.5.5h-13a.5.5 0 01-.5-.5V9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                {showCalendar && (
+                  <div className="mt-2">
+                    <CalendarPicker
+                      selectedDate={taskDate}
+                      onSelectDate={(date) => {
+                        setTaskDate(date);
+                        setShowCalendar(false);
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 {/* Task Title */}
