@@ -22,7 +22,7 @@ const AgendaSidebar = () => {
         ${
           isOpen
             ? 'bg-[rgb(17,24,39)] border-[rgb(120,130,140)]'
-            : 'bg-[rgb(230,245,240)] border-[rgb(167,243,208)]'
+            : 'bg-[rgb(167,243,208)] border-[rgb(167,243,208)]'
         }
         text-[rgb(200,200,210)]
         shadow-md p-2 flex flex-col z-50
@@ -38,6 +38,7 @@ const AgendaSidebar = () => {
           font-semibold
           transition-colors duration-300 ease-in-out
           outline-none
+          focus:outline-none focus:ring-0 focus:bg-transparent active:bg-transparent
           ${
             isOpen
               ? 'bg-[rgb(28,35,50)] text-[rgb(167,243,208)] hover:text-[rgb(140,220,190)]'
@@ -58,7 +59,7 @@ const AgendaSidebar = () => {
           {week.map((entry, idx) => (
             <li
               key={idx}
-              className="rounded-md px-2 py-1 cursor-pointer
+              className="rounded-xl px-2 py-1 cursor-pointer
                 hover:bg-[rgb(60,65,75)]
                 text-[rgb(180,180,190)]
                 flex justify-between
