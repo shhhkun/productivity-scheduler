@@ -90,3 +90,9 @@ body {
 .debug-button:hover {
   background: #444;
 }
+
+/* Calendar picker styles */
+.rdp-chevron {
+  stroke: rgb(167, 243, 208);
+  fill: rgb(167, 243, 208);
+}

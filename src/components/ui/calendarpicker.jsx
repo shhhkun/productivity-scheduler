@@ -16,10 +16,10 @@ export default function CalendarPicker({ selectedDate, onSelectDate }) {
           day: 'rounded-full w-9 h-9 hover:bg-gray-800',
           selected: 'bg-[rgb(167,243,208)] text-[rgb(17,24,39)]',
           today: 'text-mint-300',
-        }}
-        styles={{
-          nav_button_previous: { color: 'rgb(167,243,208)' },
-          nav_button_next: { color: 'rgb(167,243,208)' },
+          nav_button_previous:
+            'text-[rgb(167,243,208)] hover:text-[rgb(110,231,183)]',
+          nav_button_next:
+            'text-[rgb(167,243,208)] hover:text-[rgb(110,231,183)]',
         }}
       />
     </div>

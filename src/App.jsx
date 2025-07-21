@@ -16,6 +16,7 @@ import DebugMenu from './components/ui/debugmenu';
 import DaySelectorBar from './components/ui/dayselectorbar';
 import { addDays, subDays } from 'date-fns';
 import CalendarPicker from './components/ui/calendarpicker';
+import AgendaSidebar from './components/ui/agendasidebar';
 
 const COLORS = [
   {
@@ -430,6 +431,14 @@ function App() {
       </AnimatePresence>
 
       <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
+        
+        <div className="flex">
+          <AgendaSidebar />
+          <div className="flex-1 overflow-x-auto">
+            {/* Your scheduler here */}
+          </div>
+        </div>
+
         <Helmet>
           <title>Productivity Scheduler - Organize Your Day</title>
           <meta
@@ -516,7 +525,7 @@ function App() {
                   className="w-full flex items-center justify-between bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 hover:border-[rgb(167,243,208)] transition-all"
                 >
                   <span>{taskDate.toDateString()}</span>
-                  
+
                   {/* calendar icon using SVG */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
