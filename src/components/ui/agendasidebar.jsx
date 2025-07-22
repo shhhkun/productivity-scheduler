@@ -2,15 +2,29 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 
-const AgendaSidebar = () => {
+const AgendaSidebar = ({
+  tasks,
+  currentWeekStart,
+  selectedDate,
+  setSelectedDate,
+}) => {
   const [isOpen, setIsOpen] = useState(true);
-  const today = new Date();
 
   const week = Array.from({ length: 7 }, (_, i) => {
-    const date = addDays(today, i);
+    const date = addDays(currentWeekStart, i);
+    const dateStr = date.toISOString().split('T')[0];
+    const tasksForDay = tasks?.[dateStr] || [];
+    const incompleteCount = tasksForDay.filter(
+      (task) => !task.completed
+    ).length;
+
     return {
       day: format(date, 'EEE'),
       date: format(date, 'MM/dd'),
+      dateObj: date,
+      incompleteCount,
+      isSelected:
+        format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd'),
     };
   });
 
@@ -59,14 +73,29 @@ const AgendaSidebar = () => {
           {week.map((entry, idx) => (
             <li
               key={idx}
-              className="rounded-xl px-2 py-1 cursor-pointer
-                hover:bg-[rgb(60,65,75)]
-                text-[rgb(180,180,190)]
-                flex justify-between
-                transition-colors duration-200"
+              onClick={() => setSelectedDate(entry.dateObj)}
+              className={`rounded-xl px-2 py-1 cursor-pointer
+    flex justify-between items-center
+    transition-colors duration-200
+    ${
+      entry.isSelected
+        ? 'bg-[rgb(28,35,50)] text-[rgb(167,243,208)] font-semibold'
+        : 'text-[rgb(180,180,190)] hover:bg-[rgb(60,65,75)]'
+    }
+  `}
             >
               <span>{entry.day}</span>
-              <span className="text-[rgb(120,140,160)]">{entry.date}</span>
+              <span className="flex items-center gap-2 text-[rgb(120,140,160)]">
+                {entry.date}
+                {entry.incompleteCount > 0 && (
+                  <span
+                    className="inline-block bg-red-600 text-white rounded-full px-2 text-xs font-bold select-none"
+                    title={`${entry.incompleteCount} incomplete task${entry.incompleteCount > 1 ? 's' : ''}`}
+                  >
+                    {entry.incompleteCount}
+                  </span>
+                )}
+              </span>
             </li>
           ))}
         </ul>

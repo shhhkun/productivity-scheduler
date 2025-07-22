@@ -431,12 +431,13 @@ function App() {
       </AnimatePresence>
 
       <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
-        
         <div className="flex">
-          <AgendaSidebar />
-          <div className="flex-1 overflow-x-auto">
-            {/* Your scheduler here */}
-          </div>
+          <AgendaSidebar
+            tasks={tasks}
+            currentWeekStart={currentWeekStart}
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+          />
         </div>
 
         <Helmet>
