@@ -2,6 +2,15 @@ import { useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { format, addDays } from 'date-fns';
 
+const COLORS = [
+  { name: 'Work', color: 'bg-blue-500', light: 'bg-blue-400' },
+  { name: 'Personal', color: 'bg-green-500', light: 'bg-green-400' },
+  { name: 'Health', color: 'bg-red-500', light: 'bg-red-400' },
+  { name: 'Learning', color: 'bg-purple-500', light: 'bg-purple-400' },
+  { name: 'Social', color: 'bg-yellow-500', light: 'bg-yellow-400' },
+  { name: 'Break', color: 'bg-gray-500', light: 'bg-gray-400' },
+];
+
 const AgendaSidebar = ({
   tasks,
   currentWeekStart,
@@ -23,10 +32,19 @@ const AgendaSidebar = ({
       date: format(date, 'MM/dd'),
       dateObj: date,
       incompleteCount,
+      tasksForDay,
       isSelected:
         format(date, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd'),
     };
   });
+
+  // Helper: get color class by category name
+  const getCategoryColor = (category) => {
+    const cat = COLORS.find(
+      (c) => c.name.toLowerCase() === category?.toLowerCase()
+    );
+    return cat ? cat.color : 'bg-gray-400'; // fallback color
+  };
 
   return (
     <div
@@ -75,8 +93,7 @@ const AgendaSidebar = ({
               key={idx}
               onClick={() => setSelectedDate(entry.dateObj)}
               className={`rounded-xl px-2 py-1 cursor-pointer
-    flex justify-between items-center
-    transition-colors duration-200
+    flex flex-col transition-colors duration-200
     ${
       entry.isSelected
         ? 'bg-[rgb(28,35,50)] text-[rgb(167,243,208)] font-semibold'
@@ -84,18 +101,59 @@ const AgendaSidebar = ({
     }
   `}
             >
-              <span>{entry.day}</span>
-              <span className="flex items-center gap-2 text-[rgb(120,140,160)]">
-                {entry.date}
-                {entry.incompleteCount > 0 && (
-                  <span
-                    className="inline-block bg-red-600 text-white rounded-full px-2 text-xs font-bold select-none"
-                    title={`${entry.incompleteCount} incomplete task${entry.incompleteCount > 1 ? 's' : ''}`}
-                  >
-                    {entry.incompleteCount}
-                  </span>
-                )}
-              </span>
+              <div className="flex justify-between items-center">
+                <span>{entry.day}</span>
+                <span className="flex items-center gap-2 text-[rgb(120,140,160)]">
+                  {entry.date}
+                  {entry.incompleteCount > 0 && (
+                    <span
+                      className="inline-block bg-red-600 text-white rounded-full px-2 text-xs font-bold select-none"
+                      title={`${entry.incompleteCount} incomplete task${entry.incompleteCount > 1 ? 's' : ''}`}
+                    >
+                      {entry.incompleteCount}
+                    </span>
+                  )}
+                </span>
+              </div>
+
+              {/* Render tasks under the date */}
+              {entry.tasksForDay.length > 0 && (
+                <ul className="mt-1 pl-4 max-h-20 overflow-y-auto text-xs text-[rgb(180,180,190)]">
+                  {entry.tasksForDay
+                    .filter((task) => !task.completed) // <-- filter out completed tasks
+                    .map((task, taskIdx) => {
+                      const colorClass = getCategoryColor(task.category);
+                      let formattedTime = '';
+                      if (task.timeframe) {
+                        try {
+                          formattedTime = format(
+                            new Date(task.timeframe),
+                            'hh:mm a'
+                          );
+                        } catch {
+                          formattedTime = task.timeframe; // fallback raw string
+                        }
+                      }
+                      return (
+                        <li
+                          key={taskIdx}
+                          className="mb-0.5 flex items-center gap-1"
+                        >
+                          <span
+                            className={`inline-block w-2 h-2 rounded-full ${colorClass}`}
+                            title={task.category}
+                          ></span>
+                          <span>{task.title}</span>
+                          {formattedTime && (
+                            <span className="ml-auto text-[rgb(120,140,160)]">
+                              {formattedTime}
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                </ul>
+              )}
             </li>
           ))}
         </ul>
