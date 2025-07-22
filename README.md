@@ -33,8 +33,18 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
     - Calendar for adding tasks in advance/navigation
     - Arrows for week navigation
     - Change task storage system
-- Data persistence (localStorage or backend setup)
-- Task categorization
+- Agenda sidebar
+    - Task color coding/legend
+    - Quick nav
+    - Highlights current week being viewed
+
+### *v1.4 - Upcoming**
+- Fitness/workout plan sidebar
+    - Can hold weekly workout split
+    - Weight logger/tracker (with graph?)
+- Database storage for tasks, data persistence
+- General UI polish/possible overhaul
+- Dark/light mode toggle
 - Better streak logic
 
 ---
@@ -45,7 +55,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - [x] Achievements & title system (e.g., “Task Apprentice”)
 - [ ] Task history or log view
 - [ ] Optional streak mechanic modes (daily, 3-day/week, etc.)
-- [ ] Animation polish (reduce layout shift on reordering)
+- [x] Animation polish (reduce layout shift on reordering)
 - [ ] Data persistence via `localStorage`
 - [ ] Mobile responsiveness
 - [ ] Dark mode toggle
@@ -54,10 +64,10 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 
 ## Known Bugs/Issues
 
-- Rank up notification will sometimes persist/stay
+- [x] Rank up notification will sometimes persist/stay
     - Potential Cause(s): large influx of XP at once, de-leveling
-- Streak counter stuck at 0 days
-    - will be fixed later on once multiday scheduling is implemented
+- [ ] Streak counter stuck at 0 days
+    - will be fixed later on once data persistence and user login is implemented
 
 ## Notes
 
