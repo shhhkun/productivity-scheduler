@@ -120,20 +120,36 @@ const AgendaSidebar = ({
               {entry.tasksForDay.length > 0 && (
                 <ul className="mt-1 pl-4 max-h-20 overflow-y-auto text-xs text-[rgb(180,180,190)]">
                   {entry.tasksForDay
-                    .filter((task) => !task.completed) // <-- filter out completed tasks
+                    .filter((task) => !task.completed) // <- filter out completed tasks
+                    .sort((a, b) => {
+                      // parse "HH:mm" strings to minutes from midnight
+                      const parseTimeToMinutes = (t) => {
+                        const [h, m] = t.split(':').map(Number);
+                        return h * 60 + m;
+                      };
+                      return (
+                        parseTimeToMinutes(a.startTime) -
+                        parseTimeToMinutes(b.startTime)
+                      );
+                    })
+
                     .map((task, taskIdx) => {
                       const colorClass = getCategoryColor(task.category);
                       let formattedTime = '';
-                      if (task.timeframe) {
+                      if (task.startTime) {
+                        // format "HH:mm" string to "hh:mm AM/PM"
+                        const [hourStr, minuteStr] = task.startTime.split(':');
+                        const hour = parseInt(hourStr, 10);
+                        const minute = parseInt(minuteStr, 10);
+                        const dateObj = new Date();
+                        dateObj.setHours(hour, minute, 0, 0);
                         try {
-                          formattedTime = format(
-                            new Date(task.timeframe),
-                            'hh:mm a'
-                          );
+                          formattedTime = format(dateObj, 'hh:mm a');
                         } catch {
-                          formattedTime = task.timeframe; // fallback raw string
+                          formattedTime = task.startTime;
                         }
                       }
+
                       return (
                         <li
                           key={taskIdx}
