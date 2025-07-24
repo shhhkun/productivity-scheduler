@@ -42,7 +42,10 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - Fitness/workout plan sidebar
     - Can hold weekly workout split
     - Weight logger/tracker (with graph?)
-- Database storage for tasks, data persistence
+- Firebase integration
+    - User sign-up/login with Firebase Authentication
+    - Task and storage persistence with Firebase Database
+    - Host the app using Firebase for public access
 - General UI polish/possible overhaul
 - Dark/light mode toggle
 - Better streak logic
