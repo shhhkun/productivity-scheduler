@@ -17,6 +17,7 @@ import DaySelectorBar from './components/ui/dayselectorbar';
 import { addDays, subDays } from 'date-fns';
 import CalendarPicker from './components/ui/calendarpicker';
 import AgendaSidebar from './components/ui/agendasidebar';
+import { auth, db } from './lib/firebase';
 
 const COLORS = [
   {
