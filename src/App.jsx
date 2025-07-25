@@ -17,7 +17,19 @@ import DaySelectorBar from './components/ui/dayselectorbar';
 import { addDays, subDays } from 'date-fns';
 import CalendarPicker from './components/ui/calendarpicker';
 import AgendaSidebar from './components/ui/agendasidebar';
-import { auth, db } from './lib/firebase';
+import { auth, db } from './firebase';
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from 'firebase/auth';
+import {
+  doc,
+  setDoc,
+  getDoc,
+  onSnapshot
+} from 'firebase/firestore';
 
 const COLORS = [
   {
@@ -83,7 +95,8 @@ function App() {
   const [tasksByDate, setTasksByDate] = useState({});
 
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [tasks, setTasks] = useState({});
+  //const [tasks, setTasks] = useState({});
+  const [tasks, setTasks] = useState([]);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [newTask, setNewTask] = useState({
@@ -95,6 +108,64 @@ function App() {
     date: selectedDate.toISOString().split('T')[0],
   });
   const formRef = useRef(null); // create form reference
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [loadingUserData, setLoadingUserData] = useState(true);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPass, setLoginPass] = useState('');
+
+  useEffect(() => {
+    const q = query(
+      collection(db, 'tasks'),
+      orderBy('createdAt', 'desc') // newest first
+    )
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedTasks = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setTasks(fetchedTasks)
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          setTasks(data.tasks || {});
+          setXP(data.xp || 0);
+        } else {
+          // New user setup
+          await setDoc(userDocRef, { tasks: {}, xp: 0 });
+          setTasks({});
+          setXP(0);
+        }
+      } else {
+        setTasks({});
+        setXP(0);
+      }
+
+      setLoadingUserData(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const userDocRef = doc(db, 'users', user.uid);
+    setDoc(userDocRef, { tasks, xp }, { merge: true });
+  }, [tasks, xp, user]);
 
   // XP and Streak states
   const [xp, setXp] = useState(0);
@@ -340,6 +411,30 @@ function App() {
     });
   };
 
+  const signUp = async (email, password) => {
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Signup error:', error.message);
+    }
+  };
+
+  const logIn = async (email, password) => {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error) {
+      console.error('Login error:', error.message);
+    }
+  };
+
+  const logOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Logout error:', error.message);
+    }
+  };
+
   const toggleTaskCompletion = (taskId) => {
     setTasks((prevTasks) => {
       const dateKey = selectedDateString;
@@ -405,6 +500,46 @@ function App() {
     addDays(currentWeekStart, i)
   );
 
+  if (loadingUserData) {
+    return <div>Loading user data...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-gray-100 p-4">
+        <h2 className="text-2xl mb-4">Login</h2>
+        <input
+          type="email"
+          value={loginEmail}
+          onChange={(e) => setLoginEmail(e.target.value)}
+          placeholder="Email"
+          className="mb-2 p-2 rounded bg-gray-800 border border-gray-600 text-gray-100 w-64"
+        />
+        <input
+          type="password"
+          value={loginPass}
+          onChange={(e) => setLoginPass(e.target.value)}
+          placeholder="Password"
+          className="mb-4 p-2 rounded bg-gray-800 border border-gray-600 text-gray-100 w-64"
+        />
+        <div className="flex gap-4">
+          <button
+            onClick={() => logIn(loginEmail, loginPass)}
+            className="bg-mint-500 hover:bg-mint-600 px-4 py-2 rounded font-semibold text-gray-900"
+          >
+            Log In
+          </button>
+          <button
+            onClick={() => signUp(loginEmail, loginPass)}
+            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-semibold text-gray-100"
+          >
+            Sign Up
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <AnimatePresence>
@@ -442,6 +577,8 @@ function App() {
         </div>
 
         <Helmet>
+          <div className="text-gray-300 mb-2">Welcome, {user.email}</div>
+
           <title>Productivity Scheduler - Organize Your Day</title>
           <meta
             name="description"
