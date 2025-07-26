@@ -25,9 +25,13 @@ import {
   onAuthStateChanged
 } from 'firebase/auth';
 import {
+  getFirestore,
+  collection,
   doc,
   setDoc,
   getDoc,
+  query,
+  orderBy,
   onSnapshot
 } from 'firebase/firestore';
 
@@ -114,59 +118,6 @@ function App() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
 
-  useEffect(() => {
-    const q = query(
-      collection(db, 'tasks'),
-      orderBy('createdAt', 'desc') // newest first
-    )
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedTasks = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      setTasks(fetchedTasks)
-      setLoading(false)
-    })
-
-    return () => unsubscribe()
-  }, [])
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        const userSnap = await getDoc(userDocRef);
-
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          setTasks(data.tasks || {});
-          setXP(data.xp || 0);
-        } else {
-          // New user setup
-          await setDoc(userDocRef, { tasks: {}, xp: 0 });
-          setTasks({});
-          setXP(0);
-        }
-      } else {
-        setTasks({});
-        setXP(0);
-      }
-
-      setLoadingUserData(false);
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const userDocRef = doc(db, 'users', user.uid);
-    setDoc(userDocRef, { tasks, xp }, { merge: true });
-  }, [tasks, xp, user]);
-
   // XP and Streak states
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
@@ -216,7 +167,6 @@ function App() {
     }
 
     setLevel(newLevel);
-    //setXpToNextLevel(xpForLevel(newLevel));
   }, [xp]);
 
   // update clock every second
@@ -280,6 +230,60 @@ function App() {
       setCurrentTier(newTier);
     }
   }, [level]);
+
+  // firebase useEffects
+  useEffect(() => {
+    const q = query(
+      collection(db, 'tasks'),
+      orderBy('createdAt', 'desc') // newest first
+    )
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const fetchedTasks = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      setTasks(fetchedTasks)
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [])
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      if (currentUser) {
+        const userDocRef = doc(db, 'users', currentUser.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          setTasks(data.tasks || {});
+          setXp(data.xp || 0);
+        } else {
+          // New user setup
+          await setDoc(userDocRef, { tasks: {}, xp: 0 });
+          setTasks({});
+          setXp(0);
+        }
+      } else {
+        setTasks({});
+        setXp(0);
+      }
+
+      setLoadingUserData(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const userDocRef = doc(db, 'users', user.uid);
+    setDoc(userDocRef, { tasks, xp }, { merge: true });
+  }, [tasks, xp, user]);
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
@@ -500,6 +504,7 @@ function App() {
     addDays(currentWeekStart, i)
   );
 
+  
   if (loadingUserData) {
     return <div>Loading user data...</div>;
   }
@@ -542,6 +547,7 @@ function App() {
 
   return (
     <>
+
       <AnimatePresence>
         {showConfetti && (
           <motion.div
@@ -565,6 +571,8 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <div style={{ color: "white" }}>App loaded</div> {/* debug */}
 
       <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
         <div className="flex">
