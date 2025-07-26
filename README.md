@@ -67,8 +67,9 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 
 ## Known Bugs/Issues
 
-- [x] Rank up notification will sometimes persist/stay
-    - Potential Cause(s): large influx of XP at once, de-leveling
+- [] Rank up notification will sometimes persist/stay
+    - [X] Potential Cause: large influx of XP at once, de-leveling
+    - [ ] New Cause: after page refresh, rank up notification is static (likely tied to data persistence) 
 - [ ] Streak counter stuck at 0 days
     - will be fixed later on once data persistence and user login is implemented
 
@@ -80,6 +81,12 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - Refactorable code later on:
     - rankbadge.jsx and badgedisplay.jsx were refactored, possibly remove badgedisplay later on
     - level states and event handlers
+- Clean up code structure:
+    - Ordering of state variables
+    - Ordering of useEffect()'s
+    - Order of functions
+- Clean up Login UI
+- Add logout feature
 
 ---
 
