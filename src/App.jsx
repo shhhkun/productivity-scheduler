@@ -28,8 +28,11 @@ import {
   getFirestore,
   collection,
   doc,
+  updateDoc,
   setDoc,
   getDoc,
+  getDocs,
+  addDoc,
   query,
   orderBy,
   onSnapshot
@@ -251,28 +254,31 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      if (currentUser) {
-        const userDocRef = doc(db, 'users', currentUser.uid);
-        const userSnap = await getDoc(userDocRef);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUser(user);
 
+        // fetch user progress (xp, level)
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
-          setTasks(data.tasks || {});
           setXp(data.xp || 0);
-        } else {
-          // New user setup
-          await setDoc(userDocRef, { tasks: {}, xp: 0 });
-          setTasks({});
-          setXp(0);
+          setLevel(data.level || 1);
         }
-      } else {
-        setTasks({});
-        setXp(0);
-      }
 
-      setLoadingUserData(false);
+        // fetch tasks
+        const tasksQuery = query(collection(db, "users", user.uid, "tasks"));
+        const tasksSnap = await getDocs(tasksQuery);
+        const loadedTasks = tasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setTasks(loadedTasks);
+
+      } else { // new user setup
+        setUser(null);
+        setXp(0);
+        setLevel(1);
+        setTasks([]);
+      }
     });
 
     return () => unsubscribe();
@@ -284,6 +290,35 @@ function App() {
     const userDocRef = doc(db, 'users', user.uid);
     setDoc(userDocRef, { tasks, xp }, { merge: true });
   }, [tasks, xp, user]);
+
+  // save xp and level on change
+  useEffect(() => {
+    if (!user) return; // only save if user logged in
+    const userRef = doc(db, "users", user.uid);
+    updateDoc(userRef, { xp, level }).catch(console.error);
+  }, [xp, level, user]);
+
+  // save tasks when taskList changes (clears and rewrites all tasks; perhaps suboptimal)
+  useEffect(() => {
+    if (!user) return;
+
+    const saveAllTasks = async () => {
+      const tasksRef = collection(db, "users", user.uid, "tasks");
+
+      for (const task of tasks) {
+        if (!task.id) {
+          // new task, addDoc
+          await addDoc(tasksRef, task);
+        } else {
+          // update existing task, updateDoc
+          const taskDoc = doc(db, "users", user.uid, "tasks", task.id);
+          await updateDoc(taskDoc, task);
+        }
+      }
+    };
+
+    saveAllTasks().catch(console.error);
+  }, [tasks, user]);
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
@@ -504,7 +539,7 @@ function App() {
     addDays(currentWeekStart, i)
   );
 
-  
+
   if (loadingUserData) {
     return <div>Loading user data...</div>;
   }
@@ -547,7 +582,7 @@ function App() {
 
   return (
     <>
-
+    
       <AnimatePresence>
         {showConfetti && (
           <motion.div
@@ -571,8 +606,6 @@ function App() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div style={{ color: "white" }}>App loaded</div> {/* debug */}
 
       <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
         <div className="flex">
