@@ -115,7 +115,7 @@ function App() {
     date: selectedDate.toISOString().split('T')[0],
   });
   const formRef = useRef(null); // create form reference
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
@@ -236,25 +236,10 @@ function App() {
 
   // firebase useEffects
   useEffect(() => {
-    const q = query(
-      collection(db, 'tasks'),
-      orderBy('createdAt', 'desc') // newest first
-    )
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const fetchedTasks = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      }))
-      setTasks(fetchedTasks)
-      setLoading(false)
-    })
-
-    return () => unsubscribe()
-  }, [])
-
-  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+
+      console.log('[AuthState] Changed:', user); // Check if user is null or populated
+
       if (user) {
         setUser(user);
 
@@ -273,11 +258,14 @@ function App() {
         const loadedTasks = tasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         setTasks(loadedTasks);
 
+        setLoadingUserData(false);
+
       } else { // new user setup
         setUser(null);
         setXp(0);
         setLevel(1);
         setTasks([]);
+        setLoadingUserData(false);
       }
     });
 
@@ -285,22 +273,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || loadingUserData) return;
 
     const userDocRef = doc(db, 'users', user.uid);
     setDoc(userDocRef, { tasks, xp }, { merge: true });
-  }, [tasks, xp, user]);
+  }, [tasks, xp, user, loadingUserData]);
 
   // save xp and level on change
   useEffect(() => {
-    if (!user) return; // only save if user logged in
+    if (!user || loadingUserData) return; // only save if user logged in
     const userRef = doc(db, "users", user.uid);
     updateDoc(userRef, { xp, level }).catch(console.error);
-  }, [xp, level, user]);
+  }, [xp, level, user, loadingUserData]);
 
   // save tasks when taskList changes (clears and rewrites all tasks; perhaps suboptimal)
   useEffect(() => {
-    if (!user) return;
+    if (!user || loadingUserData) return;
 
     const saveAllTasks = async () => {
       const tasksRef = collection(db, "users", user.uid, "tasks");
@@ -318,7 +306,7 @@ function App() {
     };
 
     saveAllTasks().catch(console.error);
-  }, [tasks, user]);
+  }, [tasks, user, loadingUserData]);
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
@@ -541,10 +529,12 @@ function App() {
 
 
   if (loadingUserData) {
+    //console.log('[Render] Still loading user data...');
     return <div>Loading user data...</div>;
   }
 
   if (!user) {
+    console.log('[Render] No user found. Showing login.');
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-gray-100 p-4">
         <h2 className="text-2xl mb-4">Login</h2>
@@ -582,7 +572,7 @@ function App() {
 
   return (
     <>
-    
+
       <AnimatePresence>
         {showConfetti && (
           <motion.div
