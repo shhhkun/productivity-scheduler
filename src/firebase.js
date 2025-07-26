@@ -1,16 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "@babel/core"
+import { getFirestore } from "firebase/firestore";
 
 // web app firebase configs
 const firebaseConfig = {
-  apiKey: "AIzaSyB4bE8iB6H6n8tSGDK7yE2KK27hT_XGwDg",
-  authDomain: "productivityapp-eb15a.firebaseapp.com",
-  projectId: "productivityapp-eb15a",
-  storageBucket: "productivityapp-eb15a.appspot.com",
-  messagingSenderId: "839838284279",
-  appId: "1:839838284279:web:976482fc4f87b8c54e96f2",
-  measurementId: "G-M6HYPB1B7Y"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
 // initialize firebase
