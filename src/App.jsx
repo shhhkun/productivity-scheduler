@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'; // added useRef
+import React, { useState, useEffect, useRef, useCallback } from 'react'; // added useRef
 import { Helmet } from 'react-helmet';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Plus, Calendar, Edit3, Trash2, Save, X } from 'lucide-react';
@@ -37,6 +37,7 @@ import {
   orderBy,
   onSnapshot
 } from 'firebase/firestore';
+import { debounce } from 'lodash';
 
 const COLORS = [
   {
@@ -272,21 +273,70 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  const saveUserData = debounce(async (user, xp) => {
+    if (!user) return;
+    const userDocRef = doc(db, 'users', user.uid);
+    await setDoc(userDocRef, { xp }, { merge: true });
+  }, 2000); // 2-second debounce
+
   useEffect(() => {
     if (!user || loadingUserData) return;
 
-    const userDocRef = doc(db, 'users', user.uid);
-    setDoc(userDocRef, { tasks, xp }, { merge: true });
+    //const userDocRef = doc(db, 'users', user.uid);
+    //setDoc(userDocRef, { tasks, xp }, { merge: true });
+    saveUserData(user, xp);
   }, [tasks, xp, user, loadingUserData]);
 
   // save xp and level on change
   useEffect(() => {
     if (!user || loadingUserData) return; // only save if user logged in
+
     const userRef = doc(db, "users", user.uid);
     updateDoc(userRef, { xp, level }).catch(console.error);
   }, [xp, level, user, loadingUserData]);
 
   // save tasks when taskList changes (clears and rewrites all tasks; perhaps suboptimal)
+  const saveAllTasks = useCallback(
+    debounce(async (tasks, user) => {
+      if (!user) return;
+
+      const tasksRef = collection(db, "users", user.uid, "tasks");
+
+      const updatedTasks = [...tasks]; // copy for later state update
+
+      for (let i = 0; i < tasks.length; i++) {
+        const task = tasks[i];
+        const hash = hashTask(task);
+
+        if (task.lastSavedHash === hash) continue; // skip if unchanged
+
+        try {
+          if (!task.id) {
+            const docRef = await addDoc(tasksRef, task);
+            updatedTasks[i] = { ...task, id: docRef.id, lastSavedHash: hash };
+          } else {
+            const taskDoc = doc(db, "users", user.uid, "tasks", task.id);
+            await updateDoc(taskDoc, task);
+            updatedTasks[i] = { ...task, lastSavedHash: hash };
+          }
+        } catch (error) {
+          console.error("Error saving task:", error);
+        }
+      }
+
+      // update state only if needed
+      setTasks(updatedTasks);
+    }, 1000),
+    []
+  );
+
+  useEffect(() => {
+    if (!user || loadingUserData) return;
+
+    saveAllTasks(tasks, user); // debounce call
+  }, [tasks, user, loadingUserData]);
+
+  {/*
   useEffect(() => {
     if (!user || loadingUserData) return;
 
@@ -296,17 +346,21 @@ function App() {
       for (const task of tasks) {
         if (!task.id) {
           // new task, addDoc
-          await addDoc(tasksRef, task);
+          const docRef = await addDoc(tasksRef, task);
+          task.id = docRef.id; // assign generated id
         } else {
           // update existing task, updateDoc
           const taskDoc = doc(db, "users", user.uid, "tasks", task.id);
           await updateDoc(taskDoc, task);
         }
       }
+
+      setTasks([...tasks]); // rerender react w/ updated task id's
     };
 
     saveAllTasks().catch(console.error);
   }, [tasks, user, loadingUserData]);
+  */}
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
