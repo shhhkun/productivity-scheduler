@@ -314,7 +314,7 @@ function App() {
 
       const tasksRef = collection(db, "users", user.uid, "tasks");
 
-      // Flatten grouped task object into an array of tasks with date info
+      // flatten grouped task object into an array of tasks with date info
       const flatTasks = Object.entries(tasks).flatMap(([date, tasksOnDate]) =>
         tasksOnDate.map(task => ({ ...task, date }))
       );
@@ -322,16 +322,16 @@ function App() {
       const updatedTasks = [...flatTasks]; // copy for later state update
 
       for (let i = 0; i < flatTasks.length; i++) {
-        let task = flatTasks[i];  // Use let to reassign after save
+        let task = flatTasks[i];
         const hash = hashTask(task);
 
         if (task.lastSavedHash === hash) continue; // skip if unchanged
 
         try {
-          // Check if task.id is missing or not a string (to handle numeric ids)
+          // check if task.id is missing or not a string (to handle numeric ids)
           if (!task.id || typeof task.id !== 'string') {
             const taskToSave = { ...task };
-            delete taskToSave.id;  // Remove invalid numeric id before saving
+            delete taskToSave.id;  // remove invalid numeric id before saving
 
             const docRef = await addDoc(tasksRef, taskToSave);
             task = { ...task, id: docRef.id, lastSavedHash: hash }; // update with Firestore ID
@@ -344,7 +344,7 @@ function App() {
           console.error("Error saving task:", error);
         }
 
-        flatTasks[i] = task;  // Update flatTasks array with saved task info
+        flatTasks[i] = task;  // update flatTasks array with saved task info
       }
 
       // update state only if needed
