@@ -22,7 +22,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from 'firebase/auth';
 import {
   getFirestore,
@@ -35,7 +35,7 @@ import {
   addDoc,
   query,
   orderBy,
-  onSnapshot
+  onSnapshot,
 } from 'firebase/firestore';
 import { debounce } from 'lodash';
 
@@ -250,14 +250,13 @@ function App() {
   // firebase useEffects
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-
       console.log('[AuthState] Changed:', user); // Check if user is null or populated
 
       if (user) {
         setUser(user);
 
         // fetch user progress (xp, level)
-        const userRef = doc(db, "users", user.uid);
+        const userRef = doc(db, 'users', user.uid);
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
@@ -266,14 +265,17 @@ function App() {
         }
 
         // fetch tasks
-        const tasksQuery = query(collection(db, "users", user.uid, "tasks"));
+        const tasksQuery = query(collection(db, 'users', user.uid, 'tasks'));
         const tasksSnap = await getDocs(tasksQuery);
-        const loadedTasks = tasksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const loadedTasks = tasksSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         setTasks(loadedTasks);
 
         setLoadingUserData(false);
-
-      } else { // new user setup
+      } else {
+        // new user setup
         setUser(null);
         setXp(0);
         setLevel(1);
@@ -303,7 +305,7 @@ function App() {
   useEffect(() => {
     if (!user || loadingUserData) return; // only save if user logged in
 
-    const userRef = doc(db, "users", user.uid);
+    const userRef = doc(db, 'users', user.uid);
     updateDoc(userRef, { xp, level }).catch(console.error);
   }, [xp, level, user, loadingUserData]);
 
@@ -312,11 +314,11 @@ function App() {
     debounce(async (tasks, user) => {
       if (!user) return;
 
-      const tasksRef = collection(db, "users", user.uid, "tasks");
+      const tasksRef = collection(db, 'users', user.uid, 'tasks');
 
       // flatten grouped task object into an array of tasks with date info
       const flatTasks = Object.entries(tasks).flatMap(([date, tasksOnDate]) =>
-        tasksOnDate.map(task => ({ ...task, date }))
+        tasksOnDate.map((task) => ({ ...task, date }))
       );
 
       const updatedTasks = [...flatTasks]; // copy for later state update
@@ -331,20 +333,20 @@ function App() {
           // check if task.id is missing or not a string (to handle numeric ids)
           if (!task.id || typeof task.id !== 'string') {
             const taskToSave = { ...task };
-            delete taskToSave.id;  // remove invalid numeric id before saving
+            delete taskToSave.id; // remove invalid numeric id before saving
 
             const docRef = await addDoc(tasksRef, taskToSave);
             task = { ...task, id: docRef.id, lastSavedHash: hash }; // update with Firestore ID
           } else {
-            const taskDoc = doc(db, "users", user.uid, "tasks", task.id);
+            const taskDoc = doc(db, 'users', user.uid, 'tasks', task.id);
             await updateDoc(taskDoc, task);
             task = { ...task, lastSavedHash: hash };
           }
         } catch (error) {
-          console.error("Error saving task:", error);
+          console.error('Error saving task:', error);
         }
 
-        flatTasks[i] = task;  // update flatTasks array with saved task info
+        flatTasks[i] = task; // update flatTasks array with saved task info
       }
 
       // update state only if needed
@@ -587,7 +589,6 @@ function App() {
     addDays(currentWeekStart, i)
   );
 
-
   if (loadingUserData) {
     //console.log('[Render] Still loading user data...');
     return <div>Loading user data...</div>;
@@ -597,7 +598,8 @@ function App() {
     console.log('[Render] No user found. Showing login.');
     return (
       <div className="min-h-screen flex flex-col justify-center items-center bg-gray-900 text-gray-100 p-4">
-        <h2 className="text-2xl mb-4">Login</h2>
+        <h2 className="text-2xl mb-4">Sign In</h2>
+
         <input
           type="email"
           value={loginEmail}
@@ -612,18 +614,42 @@ function App() {
           placeholder="Password"
           className="mb-4 p-2 rounded bg-gray-800 border border-gray-600 text-gray-100 w-64"
         />
-        <div className="flex gap-4">
+
+        <div className="flex flex-col items-center gap-1 w-64">
+          {/* Sign In button - prominent */}
           <button
             onClick={() => logIn(loginEmail, loginPass)}
-            className="bg-mint-500 hover:bg-mint-600 px-4 py-2 rounded font-semibold text-gray-900"
+            //className="bg-mint-500 hover:bg-mint-600 px-6 py-2 rounded font-semibold text-gray-900 w-64 mb-2"
+            style={{
+              backgroundColor: 'rgb(167, 243, 208)', // mint background
+              color: 'rgb(17, 24, 39)', // dark blue text
+              borderRadius: '8px', // rounded corners
+              //width: '256px',
+              padding: '12px 24px',
+              fontWeight: '600', // semibold font
+              border: 'none',
+              cursor: 'pointer',
+              minWidth: '120px', // ensures button won't be too small
+              marginBottom: '12px',
+            }}
           >
-            Log In
+            Sign In
           </button>
+
+          {/* Sign Up button */}
           <button
             onClick={() => signUp(loginEmail, loginPass)}
-            className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded font-semibold text-gray-100"
+            className="text-gray-400 underline text-sm hover:text-gray-200"
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              width: '64',
+              padding: 0,
+            }}
+            aria-label="Create a new account"
           >
-            Sign Up
+            Create an account
           </button>
         </div>
       </div>
@@ -632,7 +658,6 @@ function App() {
 
   return (
     <>
-
       <AnimatePresence>
         {showConfetti && (
           <motion.div
