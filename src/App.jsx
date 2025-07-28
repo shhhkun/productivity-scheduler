@@ -97,6 +97,18 @@ function getLevelXpInfo(xp, level) {
   };
 }
 
+function hashTask(task) {
+  // create a string from task properties
+  const str = `${task.title}|${task.startTime}|${task.endTime}|${task.category}|${task.description}|${task.date}`;
+
+  // hash function
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 33) ^ str.charCodeAt(i);
+  }
+  return (hash >>> 0).toString(16);
+}
+
 function App() {
   // day selector state (for 7-day window topbar)
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -302,30 +314,49 @@ function App() {
 
       const tasksRef = collection(db, "users", user.uid, "tasks");
 
-      const updatedTasks = [...tasks]; // copy for later state update
+      // Flatten grouped task object into an array of tasks with date info
+      const flatTasks = Object.entries(tasks).flatMap(([date, tasksOnDate]) =>
+        tasksOnDate.map(task => ({ ...task, date }))
+      );
 
-      for (let i = 0; i < tasks.length; i++) {
-        const task = tasks[i];
+      const updatedTasks = [...flatTasks]; // copy for later state update
+
+      for (let i = 0; i < flatTasks.length; i++) {
+        let task = flatTasks[i];  // Use let to reassign after save
         const hash = hashTask(task);
 
         if (task.lastSavedHash === hash) continue; // skip if unchanged
 
         try {
-          if (!task.id) {
-            const docRef = await addDoc(tasksRef, task);
-            updatedTasks[i] = { ...task, id: docRef.id, lastSavedHash: hash };
+          // Check if task.id is missing or not a string (to handle numeric ids)
+          if (!task.id || typeof task.id !== 'string') {
+            const taskToSave = { ...task };
+            delete taskToSave.id;  // Remove invalid numeric id before saving
+
+            const docRef = await addDoc(tasksRef, taskToSave);
+            task = { ...task, id: docRef.id, lastSavedHash: hash }; // update with Firestore ID
           } else {
             const taskDoc = doc(db, "users", user.uid, "tasks", task.id);
             await updateDoc(taskDoc, task);
-            updatedTasks[i] = { ...task, lastSavedHash: hash };
+            task = { ...task, lastSavedHash: hash };
           }
         } catch (error) {
           console.error("Error saving task:", error);
         }
+
+        flatTasks[i] = task;  // Update flatTasks array with saved task info
       }
 
       // update state only if needed
-      setTasks(updatedTasks);
+      //setTasks(updatedTasks);
+      // Rebuild grouped tasks from flat list
+      const regroupedTasks = flatTasks.reduce((acc, task) => {
+        const date = task.date;
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(task);
+        return acc;
+      }, {});
+      setTasks(regroupedTasks);
     }, 1000),
     []
   );
@@ -333,34 +364,9 @@ function App() {
   useEffect(() => {
     if (!user || loadingUserData) return;
 
+    console.log('[SaveTasks] Triggered with tasks:', tasks);
     saveAllTasks(tasks, user); // debounce call
   }, [tasks, user, loadingUserData]);
-
-  {/*
-  useEffect(() => {
-    if (!user || loadingUserData) return;
-
-    const saveAllTasks = async () => {
-      const tasksRef = collection(db, "users", user.uid, "tasks");
-
-      for (const task of tasks) {
-        if (!task.id) {
-          // new task, addDoc
-          const docRef = await addDoc(tasksRef, task);
-          task.id = docRef.id; // assign generated id
-        } else {
-          // update existing task, updateDoc
-          const taskDoc = doc(db, "users", user.uid, "tasks", task.id);
-          await updateDoc(taskDoc, task);
-        }
-      }
-
-      setTasks([...tasks]); // rerender react w/ updated task id's
-    };
-
-    saveAllTasks().catch(console.error);
-  }, [tasks, user, loadingUserData]);
-  */}
 
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
