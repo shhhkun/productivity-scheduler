@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaCog } from 'react-icons/fa'; // gear icon
 
-export default function DebugMenu({ addXP, resetProgress }) {
+export default function DebugMenu({ addXP, resetProgress, logOut }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -26,6 +26,11 @@ export default function DebugMenu({ addXP, resetProgress }) {
           </button>
           <button className="debug-button" onClick={resetProgress}>
             Reset Progress
+          </button>
+
+          {/* logout button */}
+          <button style={styles.button} onClick={logOut}>
+            Log Out
           </button>
         </div>
       )}

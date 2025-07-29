@@ -72,6 +72,18 @@ const COLORS = [
   },
 ];
 
+function hashTask(task) {
+  // create a string from task properties
+  const str = `${task.title}|${task.startTime}|${task.endTime}|${task.category}|${task.description}|${task.date}`;
+
+  // hash function
+  let hash = 5381;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 33) ^ str.charCodeAt(i);
+  }
+  return (hash >>> 0).toString(16);
+}
+
 function getLevelXpInfo(xp, level) {
   // Cumulative XP to reach a level
   const getTotalXpForLevel = (lvl) => {
@@ -97,18 +109,6 @@ function getLevelXpInfo(xp, level) {
   };
 }
 
-function hashTask(task) {
-  // create a string from task properties
-  const str = `${task.title}|${task.startTime}|${task.endTime}|${task.category}|${task.description}|${task.date}`;
-
-  // hash function
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 33) ^ str.charCodeAt(i);
-  }
-  return (hash >>> 0).toString(16);
-}
-
 function App() {
   // day selector state (for 7-day window topbar)
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -128,7 +128,6 @@ function App() {
     date: selectedDate.toISOString().split('T')[0],
   });
   const formRef = useRef(null); // create form reference
-  //const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
@@ -162,27 +161,30 @@ function App() {
   // Controls whether the calendar popover is shown.
   const [showCalendar, setShowCalendar] = useState(false);
 
-  // load/save per-day task storage
-  useEffect(() => {
-    const saved = localStorage.getItem('tasksByDate');
-    if (saved) setTasksByDate(JSON.parse(saved));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('tasksByDate', JSON.stringify(tasksByDate));
-  }, [tasksByDate]);
-
   // update level based on current XP (100 XP per level)
+  // add a ref to track if initial data load is done
+  const initialLoadDone = useRef(false);
+
   useEffect(() => {
-    let newLevel = 1;
-    let remainingXp = xp;
+    if (xp !== null) {
+      if (!initialLoadDone.current) {
+        // First time after loading XP from DB — just set levelLoadedFromDB true and skip recalculation
+        initialLoadDone.current = true;
+        return;
+      }
+      // After initial load, recalc level on xp change
+      let newLevel = 1;
+      let remainingXp = xp;
 
-    while (remainingXp >= xpForLevel(newLevel)) {
-      remainingXp -= xpForLevel(newLevel);
-      newLevel++;
+      while (remainingXp >= xpForLevel(newLevel)) {
+        remainingXp -= xpForLevel(newLevel);
+        newLevel++;
+      }
+
+      if (newLevel !== level) {
+        setLevel(newLevel);
+      }
     }
-
-    setLevel(newLevel);
   }, [xp]);
 
   // update clock every second
@@ -192,19 +194,6 @@ function App() {
     }, 1000);
     return () => clearInterval(timer);
   }, []);
-
-  // load tasks from localStorage
-  useEffect(() => {
-    const savedTasks = localStorage.getItem('scheduler-tasks');
-    if (savedTasks) {
-      setTasks(JSON.parse(savedTasks));
-    }
-  }, []);
-
-  // save tasks to localStorage
-  useEffect(() => {
-    localStorage.setItem('scheduler-tasks', JSON.stringify(tasks));
-  }, [tasks]);
 
   // if opening form, scroll form into view (helps if scroll bar pushes form out of view)
   useEffect(() => {
@@ -250,6 +239,7 @@ function App() {
   // firebase useEffects
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setLoadingUserData(true); // set loading before fetch
       console.log('[AuthState] Changed:', user); // Check if user is null or populated
 
       if (user) {
@@ -260,8 +250,16 @@ function App() {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
-          setXp(data.xp || 0);
-          setLevel(data.level || 1);
+          //setXp(data.xp || 0);
+          //setLevel(data.level || 1);
+
+          console.log('[Fetched from Firestore]', {
+            xp: data.xp,
+            level: data.level,
+          });
+
+          setXp(data.xp ?? 0);
+          setLevel(data.level ?? 1);
         }
 
         // fetch tasks
@@ -296,8 +294,6 @@ function App() {
   useEffect(() => {
     if (!user || loadingUserData) return;
 
-    //const userDocRef = doc(db, 'users', user.uid);
-    //setDoc(userDocRef, { tasks, xp }, { merge: true });
     saveUserData(user, xp);
   }, [tasks, xp, user, loadingUserData]);
 
@@ -370,6 +366,22 @@ function App() {
     saveAllTasks(tasks, user); // debounce call
   }, [tasks, user, loadingUserData]);
 
+  // fetch on auth state change
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setXp(data.xp || 0); // <- set actual XP
+        }
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const formatTime = (date) => {
     return date.toLocaleTimeString('en-US', {
       hour12: false,
@@ -416,7 +428,6 @@ function App() {
       return;
     }
 
-    //const dateKey = selectedDateString; // <- Use your new selected day state
     const dateKey = taskDate.toISOString().split('T')[0];
 
     const task = {
@@ -619,7 +630,6 @@ function App() {
           {/* Sign In button - prominent */}
           <button
             onClick={() => logIn(loginEmail, loginPass)}
-            //className="bg-mint-500 hover:bg-mint-600 px-6 py-2 rounded font-semibold text-gray-900 w-64 mb-2"
             style={{
               backgroundColor: 'rgb(167, 243, 208)', // mint background
               color: 'rgb(17, 24, 39)', // dark blue text
@@ -1163,6 +1173,7 @@ function App() {
             setBadges([]);
             localStorage.clear();
           }}
+          logOut={logOut}
         />
 
         <Toaster />
