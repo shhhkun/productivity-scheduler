@@ -72,27 +72,6 @@ const COLORS = [
   },
 ];
 
-function hashTask(task) {
-  // create a string from task properties
-  const str = `${task.title}|${task.startTime}|${task.endTime}|${task.category}|${task.description}|${task.date}`;
-
-  // hash function
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash * 33) ^ str.charCodeAt(i);
-  }
-  return (hash >>> 0).toString(16);
-}
-
-function groupTasksByDate(flatTasks) {
-  return flatTasks.reduce((acc, task) => {
-    const date = task.date || 'unknown';
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(task);
-    return acc;
-  }, {});
-}
-
 function getLevelXpInfo(xp, level) {
   // Cumulative XP to reach a level
   const getTotalXpForLevel = (lvl) => {
@@ -266,14 +245,18 @@ function App() {
         }
 
         // fetch tasks
-        const tasksQuery = query(collection(db, 'users', user.uid, 'tasks'));
-        const tasksSnap = await getDocs(tasksQuery);
-        const loadedTasks = tasksSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        const groupedTasks = groupTasksByDate(loadedTasks);
-        setTasks(groupedTasks);
+        const tasksSnapshot = await getDocs(
+          collection(db, 'users', user.uid, 'tasks')
+        );
+        const tasksByDate = {};
+
+        for (const docSnap of tasksSnapshot.docs) {
+          const date = docSnap.id;
+          const data = docSnap.data();
+          tasksByDate[date] = data.tasks || [];
+        }
+
+        setTasks(tasksByDate);
 
         setLoadingUserData(false);
       } else {
@@ -314,49 +297,10 @@ function App() {
     debounce(async (tasks, user) => {
       if (!user) return;
 
-      const tasksRef = collection(db, 'users', user.uid, 'tasks');
-
-      // flatten grouped task object into an array of tasks with date info
-      const flatTasks = Object.entries(tasks).flatMap(([date, tasksOnDate]) =>
-        tasksOnDate.map((task) => ({ ...task, date }))
-      );
-
-      const updatedTasks = [...flatTasks]; // copy for later state update
-
-      for (let i = 0; i < flatTasks.length; i++) {
-        let task = flatTasks[i];
-        const hash = hashTask(task);
-
-        if (task.lastSavedHash === hash) continue; // skip if unchanged
-
-        try {
-          // check if task.id is missing or not a string (to handle numeric ids)
-          if (!task.id || typeof task.id !== 'string') {
-            const taskToSave = { ...task };
-            delete taskToSave.id; // remove invalid numeric id before saving
-
-            const docRef = await addDoc(tasksRef, taskToSave);
-            task = { ...task, id: docRef.id, lastSavedHash: hash }; // update with Firestore ID
-          } else {
-            const taskDoc = doc(db, 'users', user.uid, 'tasks', task.id);
-            await updateDoc(taskDoc, task);
-            task = { ...task, lastSavedHash: hash };
-          }
-        } catch (error) {
-          console.error('Error saving task:', error);
-        }
-
-        flatTasks[i] = task; // update flatTasks array with saved task info
+      for (const [date, tasksOnDate] of Object.entries(tasks)) {
+        const taskDocRef = doc(db, 'users', user.uid, 'tasks', date);
+        await setDoc(taskDocRef, { tasks: tasksOnDate }, { merge: true });
       }
-
-      // rebuild grouped tasks from flat list
-      const regroupedTasks = flatTasks.reduce((acc, task) => {
-        const date = task.date;
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(task);
-        return acc;
-      }, {});
-      setTasks(regroupedTasks);
     }, 1000),
     []
   );
@@ -433,7 +377,6 @@ function App() {
     const dateKey = taskDate.toISOString().split('T')[0];
 
     const task = {
-      id: Date.now(),
       ...newTask,
       date: dateKey,
       completed: false,
