@@ -27,7 +27,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - Debug menu (supports XP system)
 - Rank/Level up animations
 
-### **v1.3 - Upcoming**
+### **v1.3 - Schedule Upgrade**
 - Scheduler Overhaul
     - 7-day view window
     - Calendar for adding tasks in advance/navigation
@@ -38,17 +38,19 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
     - Quick nav
     - Highlights current week being viewed
 
-### *v1.4 - Upcoming**
+### *v1.4 - Database**
+- Firebase integration
+    - User sign-up/log-in with Firebase Authentication
+    - Task and storage persistence with Firebase Database
+    - Host the app using Firebase for public access
+- General UI polish
+- Dark/light mode toggle
+
+### *v1.5 - Next**
 - Fitness/workout plan sidebar
     - Can hold weekly workout split
     - Weight logger/tracker (with graph?)
-- Firebase integration
-    - User sign-up/login with Firebase Authentication
-    - Task and storage persistence with Firebase Database
-    - Host the app using Firebase for public access
-- General UI polish/possible overhaul
-- Dark/light mode toggle
-- Better streak logic
+- Fix/rework streak logic
 
 ---
 
@@ -59,7 +61,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - [ ] Task history or log view
 - [ ] Optional streak mechanic modes (daily, 3-day/week, etc.)
 - [x] Animation polish (reduce layout shift on reordering)
-- [ ] Data persistence via `localStorage`
+- [x] Data persistence via firebase
 - [ ] Mobile responsiveness
 - [ ] Dark mode toggle
 
@@ -72,6 +74,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
     - [ ] New Cause: after page refresh, rank up notification is static (likely tied to data persistence) 
 - [ ] Streak counter stuck at 0 days
     - will be fixed later on once data persistence and user login is implemented
+    - rethinking purpose/necessity of streak counter
 
 ## Notes
 
@@ -86,7 +89,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
     - Ordering of useEffect()'s
     - Order of functions
 - Clean up Login UI
-- Add logout feature
+- Clean up settings/debug menu
 
 ---
 
