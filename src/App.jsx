@@ -84,6 +84,15 @@ function hashTask(task) {
   return (hash >>> 0).toString(16);
 }
 
+function groupTasksByDate(flatTasks) {
+  return flatTasks.reduce((acc, task) => {
+    const date = task.date || 'unknown';
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(task);
+    return acc;
+  }, {});
+}
+
 function getLevelXpInfo(xp, level) {
   // Cumulative XP to reach a level
   const getTotalXpForLevel = (lvl) => {
@@ -112,10 +121,8 @@ function getLevelXpInfo(xp, level) {
 function App() {
   // day selector state (for 7-day window topbar)
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [tasksByDate, setTasksByDate] = useState({});
 
   const [currentTime, setCurrentTime] = useState(new Date());
-  //const [tasks, setTasks] = useState({});
   const [tasks, setTasks] = useState([]);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -136,7 +143,7 @@ function App() {
   // XP and Streak states
   const [xp, setXp] = useState(0);
   const [level, setLevel] = useState(1);
-  const [streak, setStreak] = useState(0);
+  const [streak, setStreak] = useState(0); // update firestore fetch to include streak later
 
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = useState(false);
@@ -156,23 +163,21 @@ function App() {
   // point at first day of the 7-day window
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
-  // Use the parent's selectedDate as the default for the new task date.
+  // use the parent's selectedDate as the default for the new task date.
   const [taskDate, setTaskDate] = useState(new Date(selectedDate));
-  // Controls whether the calendar popover is shown.
+  // controls whether the calendar popover is shown.
   const [showCalendar, setShowCalendar] = useState(false);
 
   // update level based on current XP (100 XP per level)
-  // add a ref to track if initial data load is done
-  const initialLoadDone = useRef(false);
+  const initialLoadDone = useRef(false); // ref to track initial load state
 
   useEffect(() => {
     if (xp !== null) {
       if (!initialLoadDone.current) {
-        // First time after loading XP from DB — just set levelLoadedFromDB true and skip recalculation
         initialLoadDone.current = true;
         return;
       }
-      // After initial load, recalc level on xp change
+      // after initial load, recalc level on xp change
       let newLevel = 1;
       let remainingXp = xp;
 
@@ -250,8 +255,6 @@ function App() {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
-          //setXp(data.xp || 0);
-          //setLevel(data.level || 1);
 
           console.log('[Fetched from Firestore]', {
             xp: data.xp,
@@ -269,7 +272,8 @@ function App() {
           id: doc.id,
           ...doc.data(),
         }));
-        setTasks(loadedTasks);
+        const groupedTasks = groupTasksByDate(loadedTasks);
+        setTasks(groupedTasks);
 
         setLoadingUserData(false);
       } else {
@@ -345,9 +349,7 @@ function App() {
         flatTasks[i] = task; // update flatTasks array with saved task info
       }
 
-      // update state only if needed
-      //setTasks(updatedTasks);
-      // Rebuild grouped tasks from flat list
+      // rebuild grouped tasks from flat list
       const regroupedTasks = flatTasks.reduce((acc, task) => {
         const date = task.date;
         if (!acc[date]) acc[date] = [];
