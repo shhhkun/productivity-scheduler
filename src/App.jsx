@@ -38,6 +38,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { debounce } from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 
 const COLORS = [
   {
@@ -378,6 +379,7 @@ function App() {
 
     const task = {
       ...newTask,
+      id: uuidv4(), // generate unique ID for the task
       date: dateKey,
       completed: false,
     };
