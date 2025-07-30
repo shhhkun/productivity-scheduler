@@ -89,32 +89,22 @@ function App() {
 
   const { currentWeekStart, goToNextWeek, goToPreviousWeek } = useWeekNav(); // week navigation hooks
 
-  const formRef = useRef(null); // create form reference
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPass, setLoginPass] = useState('');
+  const timeSlots = generateTimeSlots(); // time slots for the schedule grid
 
-  // XP and Streak states
-  const [streak, setStreak] = useState(0); // update firestore fetch to include streak later
-
-  // use the parent's selectedDate as the default for the new task date.
-  const [taskDate, setTaskDate] = useState(new Date(selectedDate));
-  // controls whether the calendar popover is shown.
-  const [showCalendar, setShowCalendar] = useState(false);
-
-  // if opening form, scroll form into view (helps if scroll bar pushes form out of view)
-  useEffect(() => {
-    if ((isAddingTask || editingTask) && formRef.current) {
-      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [isAddingTask, editingTask]);
-
-  const getCategoryColor = (category) => {
+  const getCategoryColor = (category) => { // task cateogory legend managing
     return COLORS.find((c) => c.name === category) || COLORS[0];
   };
 
-  const timeSlots = generateTimeSlots();
+  const [taskDate, setTaskDate] = useState(new Date(selectedDate)); // use the parent's selectedDate as the default for the new task date
+  const [showCalendar, setShowCalendar] = useState(false); // controls calendar popover visibility
 
-  const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
+  const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for bottom display bar
+
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPass, setLoginPass] = useState('');
+
+  // XP and Streak states [NOT YET IMPLEMENTED LOGIC]
+  const [streak, setStreak] = useState(0); // update firestore fetch to include streak later
 
   if (loadingUserData) {
     //console.log('[Render] Still loading user data...');
