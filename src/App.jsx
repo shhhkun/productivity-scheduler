@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'; // added useRef
+import { useState, useEffect, useRef } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Plus, Calendar, Edit3, Trash2, Save, X } from 'lucide-react';
+import { Plus, Calendar, Edit3, Trash2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 import Modal from '@/components/ui/modal';
 import CompleteButton from '@/components/ui/completebutton';
 import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
-//import BadgeDisplay from './components/ui/badgedisplay';
 import Confetti from 'react-confetti';
 import { useWindowSize } from './hooks/usewindowsize';
 import RankBadge from './components/ui/rankbadge';
@@ -17,93 +15,38 @@ import DaySelectorBar from './components/ui/dayselectorbar';
 import { addDays, subDays } from 'date-fns';
 import CalendarPicker from './components/ui/calendarpicker';
 import AgendaSidebar from './components/ui/agendasidebar';
-import { auth, db } from './firebase';
+import { auth } from './firebase';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged,
 } from 'firebase/auth';
-import {
-  getFirestore,
-  collection,
-  doc,
-  updateDoc,
-  setDoc,
-  getDoc,
-  getDocs,
-  addDoc,
-  query,
-  orderBy,
-  onSnapshot,
-} from 'firebase/firestore';
-import { debounce } from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
 
-const COLORS = [
-  {
-    name: 'Work',
-    color: 'bg-blue-500',
-    light: 'bg-blue-400',
-  },
-  {
-    name: 'Personal',
-    color: 'bg-green-500',
-    light: 'bg-green-400',
-  },
-  {
-    name: 'Health',
-    color: 'bg-red-500',
-    light: 'bg-red-400',
-  },
-  {
-    name: 'Learning',
-    color: 'bg-purple-500',
-    light: 'bg-purple-400',
-  },
-  {
-    name: 'Social',
-    color: 'bg-yellow-500',
-    light: 'bg-yellow-400',
-  },
-  {
-    name: 'Break',
-    color: 'bg-gray-500',
-    light: 'bg-gray-400',
-  },
-];
-
-function getLevelXpInfo(xp, level) {
-  // Cumulative XP to reach a level
-  const getTotalXpForLevel = (lvl) => {
-    let total = 0;
-    for (let i = 1; i < lvl; i++) {
-      total += 100 + (i - 1) * 20;
-    }
-    return total;
-  };
-
-  const xpForCurrentLevel = getTotalXpForLevel(level);
-  const xpForNextLevel = getTotalXpForLevel(level + 1);
-
-  const xpToNextLevel = xpForNextLevel - xp;
-  const levelProgress =
-    ((xp - xpForCurrentLevel) / (xpForNextLevel - xpForCurrentLevel)) * 100;
-  const currentXpInLevel = xp - xpForCurrentLevel;
-
-  return {
-    xpToNextLevel,
-    levelProgress: Math.max(0, Math.min(levelProgress, 100)),
-    currentXpInLevel,
-  };
-}
+import COLORS from './utils/colors';
+import useFirebaseUser from './hooks/usefirebaseuser';
+import useTaskHandlers from './hooks/usetaskhandlers';
+import { getLevelXpInfo, xpForLevel } from './utils/levelxp';
+import { formatTime, formatDate, generateTimeSlots } from './utils/time';
 
 function App() {
+  // firebase
+  const {
+    user,
+    xp,
+    setXp,
+    level,
+    setLevel,
+    tasks,
+    setTasks,
+    userDataLoaded,
+    loadingUserData,
+  } = useFirebaseUser();
+
   // day selector state (for 7-day window topbar)
   const [selectedDate, setSelectedDate] = useState(new Date());
+  // format selected date for comparison (YYYY-MM-DD)
+  const selectedDateString = selectedDate.toISOString().split('T')[0];
 
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [tasks, setTasks] = useState([]);
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [newTask, setNewTask] = useState({
@@ -114,16 +57,34 @@ function App() {
     description: '',
     date: selectedDate.toISOString().split('T')[0],
   });
+
+  const {
+    handleAddTask,
+    handleEditTask,
+    handleUpdateTask,
+    handleDeleteTask,
+    toggleTaskCompletion,
+    getTasksForTimeSlot,
+  } = useTaskHandlers({
+    tasks,
+    setTasks,
+    selectedDateString,
+    setXp,
+    isAddingTask,
+    setIsAddingTask,
+    editingTask,
+    setEditingTask,
+    newTask,
+    setNewTask,
+  });
+
+  const [currentTime, setCurrentTime] = useState(new Date());
+
   const formRef = useRef(null); // create form reference
-  const [user, setUser] = useState(null);
-  const [loadingUserData, setLoadingUserData] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
-  const [userDataLoaded, setUserDataLoaded] = useState(false);
 
   // XP and Streak states
-  const [xp, setXp] = useState(0);
-  const [level, setLevel] = useState(1);
   const [streak, setStreak] = useState(0); // update firestore fetch to include streak later
 
   const { width, height } = useWindowSize();
@@ -131,15 +92,6 @@ function App() {
 
   // rank badge states for tier and rank up animation
   const [currentTier, setCurrentTier] = useState('');
-
-  // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
-  const xpForLevel = (level) => 100 + (level - 1) * 20;
-
-  // format selected date for comparison (YYYY-MM-DD)
-  const selectedDateString = selectedDate.toISOString().split('T')[0];
-
-  // filter tasks for this date
-  const tasksForSelectedDate = tasks[selectedDateString] || [];
 
   // point at first day of the 7-day window
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
@@ -230,245 +182,6 @@ function App() {
     }
   }, [level]);
 
-  // firebase useEffects
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setLoadingUserData(true); // set loading before fetch
-      console.log('[AuthState] Changed:', user); // Check if user is null or populated
-
-      if (user) {
-        setUser(user);
-
-        // fetch user progress (xp, level)
-        const userRef = doc(db, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-
-          console.log('[Fetched from Firestore]', {
-            xp: data.xp,
-            level: data.level,
-          });
-
-          setXp(data.xp ?? 0);
-          setLevel(data.level ?? 1);
-        }
-
-        // fetch tasks
-        const tasksSnapshot = await getDocs(
-          collection(db, 'users', user.uid, 'tasks')
-        );
-        const tasksByDate = {};
-
-        for (const docSnap of tasksSnapshot.docs) {
-          const date = docSnap.id;
-          const data = docSnap.data();
-          tasksByDate[date] = data.tasks || [];
-        }
-
-        setTasks(tasksByDate);
-
-        setLoadingUserData(false);
-        setUserDataLoaded(true); // set user data loaded after fetching
-      } else {
-        // new user setup
-        setUser(null);
-        setXp(0);
-        setLevel(1);
-        setTasks([]);
-        setLoadingUserData(false);
-        setUserDataLoaded(false); // reset user data loaded
-      }
-    });
-
-    return () => unsubscribe();
-  }, []);
-
-  const saveUserData = debounce(async (user, xp) => {
-    if (!user) return;
-    const userDocRef = doc(db, 'users', user.uid);
-    await setDoc(userDocRef, { xp }, { merge: true });
-  }, 2000); // 2-second debounce
-
-  useEffect(() => {
-    if (!user || loadingUserData) return;
-
-    saveUserData(user, xp);
-  }, [tasks, xp, user, loadingUserData]);
-
-  // save xp and level on change
-  useEffect(() => {
-    if (!user || loadingUserData) return; // only save if user logged in
-
-    const userRef = doc(db, 'users', user.uid);
-    updateDoc(userRef, { xp, level }).catch(console.error);
-  }, [xp, level, user, loadingUserData]);
-
-  // save tasks when taskList changes (clears and rewrites all tasks; perhaps suboptimal)
-  const saveAllTasks = useCallback(
-    debounce(async (tasks, user) => {
-      if (!user) return;
-
-      for (const [date, tasksOnDate] of Object.entries(tasks)) {
-        const taskDocRef = doc(db, 'users', user.uid, 'tasks', date);
-        await setDoc(taskDocRef, { tasks: tasksOnDate }, { merge: true });
-      }
-    }, 1000),
-    []
-  );
-
-  useEffect(() => {
-    if (!user || loadingUserData) return;
-
-    console.log('[SaveTasks] Triggered with tasks:', tasks);
-    saveAllTasks(tasks, user); // debounce call
-  }, [tasks, user, loadingUserData]);
-
-  // fetch on auth state change
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setXp(data.xp || 0); // <- set actual XP
-        }
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
-  const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const generateTimeSlots = () => {
-    const slots = [];
-    for (let hour = 0; hour < 24; hour++) {
-      const time = `${hour.toString().padStart(2, '0')}:00`;
-      slots.push(time);
-    }
-    return slots;
-  };
-
-  const handleAddTask = () => {
-    if (!newTask.title || !newTask.startTime || !newTask.endTime) {
-      toast({
-        title: 'Missing Information',
-        description: 'Please fill in all required fields.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    if (newTask.startTime >= newTask.endTime) {
-      toast({
-        title: 'Invalid Time Range',
-        description: 'End time must be after start time.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const dateKey = taskDate.toISOString().split('T')[0];
-
-    const task = {
-      ...newTask,
-      id: uuidv4(), // generate unique ID for the task
-      date: dateKey,
-      completed: false,
-    };
-
-    setTasks((prevTasks) => {
-      const updatedTasksForDate = [...(prevTasks[dateKey] || []), task];
-      return {
-        ...prevTasks,
-        [dateKey]: updatedTasksForDate,
-      };
-    });
-
-    setNewTask({
-      title: '',
-      startTime: '',
-      endTime: '',
-      category: 'Work',
-      description: '',
-    });
-    setIsAddingTask(false);
-    toast({
-      title: 'Task Added',
-      description: 'Your task has been successfully scheduled!',
-    });
-  };
-
-  const handleEditTask = (task) => {
-    setEditingTask(task.id);
-    setNewTask(task);
-  };
-
-  const handleUpdateTask = () => {
-    const dateKey = selectedDateString;
-
-    setTasks((prevTasks) => {
-      const updatedTasksForDate = prevTasks[dateKey].map((task) =>
-        task.id === editingTask ? { ...newTask, id: editingTask } : task
-      );
-
-      return {
-        ...prevTasks,
-        [dateKey]: updatedTasksForDate,
-      };
-    });
-
-    setEditingTask(null);
-    setNewTask({
-      title: '',
-      startTime: '',
-      endTime: '',
-      category: 'Work',
-      description: '',
-    });
-
-    toast({
-      title: 'Task Updated',
-      description: 'Your task has been successfully updated!',
-    });
-  };
-
-  const handleDeleteTask = (taskId) => {
-    setTasks((prevTasks) => {
-      const dateKey = selectedDateString;
-      const updatedDateTasks = prevTasks[dateKey].filter(
-        (task) => task.id !== taskId
-      );
-      return {
-        ...prevTasks,
-        [dateKey]: updatedDateTasks,
-      };
-    });
-
-    toast({
-      title: 'Task Deleted',
-      description: 'Task has been removed from your schedule.',
-    });
-  };
-
   const signUp = async (email, password) => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
@@ -493,51 +206,11 @@ function App() {
     }
   };
 
-  const toggleTaskCompletion = (taskId) => {
-    setTasks((prevTasks) => {
-      const dateKey = selectedDateString;
-      const updatedDateTasks = prevTasks[dateKey].map((task) => {
-        if (task.id === taskId) {
-          const newCompletedState = !task.completed;
-
-          if (newCompletedState && !task.completed) {
-            setXp((prevXp) => prevXp + 20);
-          } else if (!newCompletedState && task.completed) {
-            setXp((prevXp) => Math.max(prevXp - 20, 0));
-          }
-
-          return { ...task, completed: newCompletedState };
-        }
-        return task;
-      });
-
-      return {
-        ...prevTasks,
-        [dateKey]: updatedDateTasks,
-      };
-    });
-  };
-
-  const getTasksForTimeSlot = (time) => {
-    const slotHour = parseInt(time.split(':')[0], 10);
-
-    return tasksForSelectedDate.filter((task) => {
-      const startHour = parseInt(task.startTime.split(':')[0], 10);
-      const endHour = parseInt(task.endTime.split(':')[0], 10);
-
-      return slotHour >= startHour && slotHour < endHour;
-    });
-  };
-
   const getCategoryColor = (category) => {
     return COLORS.find((c) => c.name === category) || COLORS[0];
   };
 
   const timeSlots = generateTimeSlots();
-
-  const completedCount = Object.values(tasks)
-    .flat()
-    .filter((task) => task.completed).length; // count completed tasks
 
   const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
 
@@ -553,10 +226,6 @@ function App() {
     setCurrentWeekStart(prevWeek);
     setSelectedDate(prevWeek);
   };
-
-  const currentWeekDates = Array.from({ length: 7 }, (_, i) =>
-    addDays(currentWeekStart, i)
-  );
 
   if (loadingUserData) {
     //console.log('[Render] Still loading user data...');
@@ -1102,10 +771,7 @@ function App() {
           <div className="relative flex items-center justify-between w-full min-h-[72px]">
             {/* Left: Badge */}
             <div className="flex items-center h-full">
-              <RankBadge 
-                tier={currentTier}
-                userDataLoaded={userDataLoaded}
-              />
+              <RankBadge tier={currentTier} userDataLoaded={userDataLoaded} />
             </div>
 
             {/* Center: XP & Streak */}
