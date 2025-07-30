@@ -1,30 +1,32 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Calendar, Edit3, Trash2, Save, X } from 'lucide-react';
+import Confetti from 'react-confetti';
+
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/toaster';
 import Modal from '@/components/ui/modal';
 import CompleteButton from '@/components/ui/completebutton';
 import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
-import Confetti from 'react-confetti';
-import { useWindowSize } from './hooks/usewindowsize';
-import RankBadge from './components/ui/rankbadge';
-import DebugMenu from './components/ui/debugmenu';
-import DaySelectorBar from './components/ui/dayselectorbar';
-import CalendarPicker from './components/ui/calendarpicker';
-import AgendaSidebar from './components/ui/agendasidebar';
+import RankBadge from '@/components/ui/rankbadge';
+import DebugMenu from '@/components/ui/debugmenu';
+import DaySelectorBar from '@/components/ui/dayselectorbar';
+import CalendarPicker from '@/components/ui/calendarpicker';
+import AgendaSidebar from '@/components/ui/agendasidebar';
 
-import useFirebaseUser from './hooks/usefirebaseuser';
-import useAuth from './hooks/useauth';
-import useTaskHandlers from './hooks/usetaskhandlers';
-import useWeekNav from './hooks/useweeknav';
-import useClock from './hooks/useclock';
-import useConfetti from './hooks/useconfetti';
-import useRankBadge from './hooks/userankbadge'; 
-import COLORS from './utils/colors';
-import { getLevelXpInfo, useLevelUp } from './utils/levelxp';
-import { formatTime, formatDate, generateTimeSlots } from './utils/time';
+import useFirebaseUser from '@/hooks/usefirebaseuser';
+import useAuth from '@/hooks/useauth';
+import useTaskHandlers from '@/hooks/usetaskhandlers';
+import useWeekNav from '@/hooks/useweeknav';
+import useClock from '@/hooks/useclock';
+import { useWindowSize } from '@/hooks/usewindowsize';
+import useConfetti from '@/hooks/useconfetti';
+import useRankBadge from '@/hooks/userankbadge';
+import { getLevelXpInfo, useLevelUp } from '@/hooks/levelxp';
+
+import COLORS from '@/utils/colors';
+import { formatTime, formatDate, generateTimeSlots } from '@/utils/time';
 
 function App() {
   // firebase
@@ -42,10 +44,8 @@ function App() {
 
   const { signUp, logIn, logOut } = useAuth();
 
-  // day selector state (for 7-day window topbar)
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  // format selected date for comparison (YYYY-MM-DD)
-  const selectedDateString = selectedDate.toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(new Date()); // day selector for 7-day window top bar
+  const selectedDateString = selectedDate.toISOString().split('T')[0]; // formated select date for comparisons (YYYY-MM-DD)
 
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
