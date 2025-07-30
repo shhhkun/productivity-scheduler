@@ -12,20 +12,18 @@ import { useWindowSize } from './hooks/usewindowsize';
 import RankBadge from './components/ui/rankbadge';
 import DebugMenu from './components/ui/debugmenu';
 import DaySelectorBar from './components/ui/dayselectorbar';
-import { addDays, subDays } from 'date-fns';
 import CalendarPicker from './components/ui/calendarpicker';
 import AgendaSidebar from './components/ui/agendasidebar';
-import { auth } from './firebase';
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-} from 'firebase/auth';
 
-import COLORS from './utils/colors';
 import useFirebaseUser from './hooks/usefirebaseuser';
+import useAuth from './hooks/useauth';
 import useTaskHandlers from './hooks/usetaskhandlers';
-import { getLevelXpInfo, xpForLevel } from './utils/levelxp';
+import useWeekNav from './hooks/useweeknav';
+import useClock from './hooks/useclock';
+import useConfetti from './hooks/useconfetti';
+import useRankBadge from './hooks/userankbadge'; 
+import COLORS from './utils/colors';
+import { getLevelXpInfo, useLevelUp } from './utils/levelxp';
 import { formatTime, formatDate, generateTimeSlots } from './utils/time';
 
 function App() {
@@ -41,6 +39,8 @@ function App() {
     userDataLoaded,
     loadingUserData,
   } = useFirebaseUser();
+
+  const { signUp, logIn, logOut } = useAuth();
 
   // day selector state (for 7-day window topbar)
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -78,7 +78,16 @@ function App() {
     setNewTask,
   });
 
-  const [currentTime, setCurrentTime] = useState(new Date());
+  useLevelUp(xp, level, setLevel); // custom util to handle level up logic
+
+  const currentTime = useClock(); // custom hook to get current time for clock
+
+  const { width, height } = useWindowSize(); // dimensions for confetti effect
+  const showConfetti = useConfetti(level, userDataLoaded); // confetti effect on level up
+
+  const currentTier = useRankBadge(level); // get user's rank badge based on level
+
+  const { currentWeekStart, goToNextWeek, goToPreviousWeek } = useWeekNav(); // week navigation hooks
 
   const formRef = useRef(null); // create form reference
   const [loginEmail, setLoginEmail] = useState('');
@@ -87,51 +96,10 @@ function App() {
   // XP and Streak states
   const [streak, setStreak] = useState(0); // update firestore fetch to include streak later
 
-  const { width, height } = useWindowSize();
-  const [showConfetti, setShowConfetti] = useState(false);
-
-  // rank badge states for tier and rank up animation
-  const [currentTier, setCurrentTier] = useState('');
-
-  // point at first day of the 7-day window
-  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
-
   // use the parent's selectedDate as the default for the new task date.
   const [taskDate, setTaskDate] = useState(new Date(selectedDate));
   // controls whether the calendar popover is shown.
   const [showCalendar, setShowCalendar] = useState(false);
-
-  // update level based on current XP (100 XP per level)
-  const initialLoadDone = useRef(false); // ref to track initial load state
-
-  useEffect(() => {
-    if (xp !== null) {
-      if (!initialLoadDone.current) {
-        initialLoadDone.current = true;
-        return;
-      }
-      // after initial load, recalc level on xp change
-      let newLevel = 1;
-      let remainingXp = xp;
-
-      while (remainingXp >= xpForLevel(newLevel)) {
-        remainingXp -= xpForLevel(newLevel);
-        newLevel++;
-      }
-
-      if (newLevel !== level) {
-        setLevel(newLevel);
-      }
-    }
-  }, [xp]);
-
-  // update clock every second
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   // if opening form, scroll form into view (helps if scroll bar pushes form out of view)
   useEffect(() => {
@@ -140,72 +108,6 @@ function App() {
     }
   }, [isAddingTask, editingTask]);
 
-  // confetti effect on level up
-  const prevLevel = useRef(null);
-  useEffect(() => {
-    if (!userDataLoaded) return; // prevent effect from running until user data is loaded
-
-    if (prevLevel.current === null) {
-      // first time after load, just set prevLevel without triggering confetti
-      prevLevel.current = level;
-      return;
-    }
-
-    if (level > prevLevel.current) {
-      setShowConfetti(true);
-      const timer = setTimeout(() => setShowConfetti(false), 4000);
-
-      prevLevel.current = level; // move this here so it updates BEFORE returning cleanup
-
-      return () => clearTimeout(timer);
-    }
-    prevLevel.current = level; // keep this for the else case (optional)
-  }, [level, userDataLoaded]);
-
-  // badge/rank up effect
-  useEffect(() => {
-    const badgeLevels = [
-      { level: 'Bronze', threshold: 5 },
-      { level: 'Silver', threshold: 15 },
-      { level: 'Gold', threshold: 30 },
-      { level: 'Platinum', threshold: 50 },
-      { level: 'Diamond', threshold: 75 },
-      { level: 'Scheduler Sage', threshold: 100 },
-    ];
-
-    const newTier = badgeLevels.reduce((acc, badge) => {
-      return level >= badge.threshold ? badge.level : acc;
-    }, '');
-
-    if (newTier !== currentTier) {
-      setCurrentTier(newTier);
-    }
-  }, [level]);
-
-  const signUp = async (email, password) => {
-    try {
-      await createUserWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error('Signup error:', error.message);
-    }
-  };
-
-  const logIn = async (email, password) => {
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-    } catch (error) {
-      console.error('Login error:', error.message);
-    }
-  };
-
-  const logOut = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Logout error:', error.message);
-    }
-  };
-
   const getCategoryColor = (category) => {
     return COLORS.find((c) => c.name === category) || COLORS[0];
   };
@@ -213,19 +115,6 @@ function App() {
   const timeSlots = generateTimeSlots();
 
   const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for display bar
-
-  // week navigation handlers
-  const goToNextWeek = () => {
-    const nextWeek = addDays(currentWeekStart, 7);
-    setCurrentWeekStart(nextWeek);
-    setSelectedDate(nextWeek);
-  };
-
-  const goToPreviousWeek = () => {
-    const prevWeek = subDays(currentWeekStart, 7);
-    setCurrentWeekStart(prevWeek);
-    setSelectedDate(prevWeek);
-  };
 
   if (loadingUserData) {
     //console.log('[Render] Still loading user data...');

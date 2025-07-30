@@ -1,5 +1,7 @@
+import { useEffect, useRef } from 'react';
+
 export function getLevelXpInfo(xp, level) {
-  // Cumulative XP to reach a level
+  // cumulative XP to reach a level
   const getTotalXpForLevel = (lvl) => {
     let total = 0;
     for (let i = 1; i < lvl; i++) {
@@ -25,3 +27,29 @@ export function getLevelXpInfo(xp, level) {
 
 // XP required to reach next level (e.g., Level 1: 100, Level 2: 120, etc.)
 export const xpForLevel = (level) => 100 + (level - 1) * 20;
+
+// update level based on current XP
+export function useLevelUp(xp, level, setLevel) {
+  const initialLoadDone = useRef(false); // ref to track initial load state
+
+  useEffect(() => {
+    if (xp !== null) {
+      if (!initialLoadDone.current) {
+        initialLoadDone.current = true;
+        return;
+      }
+      // after initial load, recalc level on xp change
+      let newLevel = 1;
+      let remainingXp = xp;
+
+      while (remainingXp >= xpForLevel(newLevel)) {
+        remainingXp -= xpForLevel(newLevel);
+        newLevel++;
+      }
+
+      if (newLevel !== level) {
+        setLevel(newLevel);
+      }
+    }
+  }, [xp]);
+}
