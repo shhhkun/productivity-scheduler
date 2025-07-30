@@ -119,6 +119,7 @@ function App() {
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
+  const [userDataLoaded, setUserDataLoaded] = useState(false);
 
   // XP and Streak states
   const [xp, setXp] = useState(0);
@@ -188,8 +189,16 @@ function App() {
   }, [isAddingTask, editingTask]);
 
   // confetti effect on level up
-  const prevLevel = useRef(level);
+  const prevLevel = useRef(null);
   useEffect(() => {
+    if (!userDataLoaded) return; // prevent effect from running until user data is loaded
+
+    if (prevLevel.current === null) {
+      // first time after load, just set prevLevel without triggering confetti
+      prevLevel.current = level;
+      return;
+    }
+
     if (level > prevLevel.current) {
       setShowConfetti(true);
       const timer = setTimeout(() => setShowConfetti(false), 4000);
@@ -199,7 +208,7 @@ function App() {
       return () => clearTimeout(timer);
     }
     prevLevel.current = level; // keep this for the else case (optional)
-  }, [level]);
+  }, [level, userDataLoaded]);
 
   // badge/rank up effect
   useEffect(() => {
@@ -260,6 +269,7 @@ function App() {
         setTasks(tasksByDate);
 
         setLoadingUserData(false);
+        setUserDataLoaded(true); // set user data loaded after fetching
       } else {
         // new user setup
         setUser(null);
@@ -267,6 +277,7 @@ function App() {
         setLevel(1);
         setTasks([]);
         setLoadingUserData(false);
+        setUserDataLoaded(false); // reset user data loaded
       }
     });
 
@@ -1091,7 +1102,10 @@ function App() {
           <div className="relative flex items-center justify-between w-full min-h-[72px]">
             {/* Left: Badge */}
             <div className="flex items-center h-full">
-              <RankBadge tier={currentTier} />
+              <RankBadge 
+                tier={currentTier}
+                userDataLoaded={userDataLoaded}
+              />
             </div>
 
             {/* Center: XP & Streak */}

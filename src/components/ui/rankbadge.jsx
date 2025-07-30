@@ -20,12 +20,20 @@ const tierTitles = {
   'Scheduler Sage': 'Sage',
 };
 
-export default function RankBadge({ tier }) {
+export default function RankBadge({ tier, userDataLoaded }) {
   const [showRankUp, setShowRankUp] = useState(false);
   const prevTier = useRef(null);
   const timerRef = useRef(null);
 
   useEffect(() => {
+    if (!userDataLoaded) return; // prevent effect from running until user data is loaded
+
+    if (prevTier.current === null) {
+      // first time after load, just set prevTier without triggering rank up
+      prevTier.current = tier;
+      return;
+    }
+
     if (tier && tier !== prevTier.current) {
       setShowRankUp(true);
 
@@ -39,7 +47,7 @@ export default function RankBadge({ tier }) {
 
       prevTier.current = tier;
     }
-  }, [tier]);
+  }, [tier, userDataLoaded]);
 
   useEffect(() => {
     return () => {
