@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'; // added useRef
-import { Helmet } from 'react-helmet';
+import { HelmetProvider } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Clock, Plus, Calendar, Edit3, Trash2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -660,15 +660,15 @@ function App() {
           />
         </div>
 
-        <Helmet>
-          <div className="text-gray-300 mb-2">Welcome, {user.email}</div>
+        <HelmetProvider>
+          {/*<div className="text-gray-300 mb-2">Welcome, {user.email}</div>*/}
 
           <title>Productivity Scheduler - Organize Your Day</title>
           <meta
             name="description"
             content="A beautiful, minimalistic productivity scheduler with color-coded blocks to help you organize your daily tasks and activities."
           />
-        </Helmet>
+        </HelmetProvider>
         <div className="container mx-auto px-4 py-6 pb-28">
           {/* Header with Clock */}
           <motion.div
