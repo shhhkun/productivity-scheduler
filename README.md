@@ -69,9 +69,9 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 
 ## Known Bugs/Issues
 
-- [] Rank up notification will sometimes persist/stay
-    - [X] Potential Cause: large influx of XP at once, de-leveling
-    - [ ] New Cause: after page refresh, rank up notification is static (likely tied to data persistence) 
+- [x] Rank up notification will sometimes persist/stay
+    - [x] Potential Cause: large influx of XP at once, de-leveling
+    - [x] New Cause: after page refresh, rank up notification is static (likely tied to data persistence) 
 - [ ] Streak counter stuck at 0 days
     - will be fixed later on once data persistence and user login is implemented
     - rethinking purpose/necessity of streak counter
