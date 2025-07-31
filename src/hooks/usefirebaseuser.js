@@ -1,12 +1,11 @@
 import { useEffect, useState, useCallback } from 'react';
 import { auth, db } from '@/firebase';
-import {
-  onAuthStateChanged
-} from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   collection,
   doc,
   updateDoc,
+  deleteDoc,
   setDoc,
   getDoc,
   getDocs,
@@ -102,7 +101,16 @@ export default function useFirebaseUser() {
 
       for (const [date, tasksOnDate] of Object.entries(tasks)) {
         const taskDocRef = doc(db, 'users', user.uid, 'tasks', date);
-        await setDoc(taskDocRef, { tasks: tasksOnDate }, { merge: true });
+
+        if (tasksOnDate.length === 0) {
+          // if no tasks for this date, delete the doc
+          await deleteDoc(taskDocRef);
+          console.log(`[Firestore] Deleted empty task doc for date ${date}`);
+        } else {
+          // otherwise save/update the doc
+          await setDoc(taskDocRef, { tasks: tasksOnDate }, { merge: true });
+          console.log(`[Firestore] Updated tasks for date ${date}`);
+        }
       }
     }, 1000),
     []
