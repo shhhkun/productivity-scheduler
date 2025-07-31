@@ -123,21 +123,7 @@ export default function useFirebaseUser() {
     saveAllTasks(tasks, user); // debounce call
   }, [tasks, user, loadingUserData]);
 
-  // fetch on auth state change
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
-      if (user) {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setXp(data.xp || 0); // <- set actual XP
-        }
-      }
-    };
-
-    fetchUserData();
-  }, []);
+  useEffect(() => {}, []); // dummy effect
 
   return {
     user,
