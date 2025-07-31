@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { addDays, subDays } from 'date-fns';
 
-export default function useWeekNav() {
+export default function useWeekNav(setSelectedDate) {
   // point at first day of the 7-day window
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
