@@ -38,7 +38,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
     - Quick nav
     - Highlights current week being viewed
 
-### *v1.4 - Database**
+### *v1.4 - Firestore Database & User Authentication**
 - Firebase integration
     - User sign-up/log-in with Firebase Authentication
     - Task and storage persistence with Firebase Database
@@ -64,6 +64,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - [x] Data persistence via firebase
 - [ ] Mobile responsiveness
 - [ ] Dark mode toggle
+- [x] Code cleanup
 
 ---
 
