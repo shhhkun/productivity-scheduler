@@ -1,18 +1,15 @@
 import { useState } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Calendar, Edit3, Trash2, Save, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import Confetti from 'react-confetti';
 
 import { Button } from '@/components/ui/button';
-import { Toaster } from '@/components/ui/toaster';
-import Modal from '@/components/ui/modal';
-import CompleteButton from '@/components/ui/completebutton';
+import Toaster from '@/components/ui/toaster';
 import XpStreakDisplay from '@/components/ui/xpstreakdisplay';
 import RankBadge from '@/components/ui/rankbadge';
 import DebugMenu from '@/components/ui/debugmenu';
 import DaySelectorBar from '@/components/ui/dayselectorbar';
-import CalendarPicker from '@/components/ui/calendarpicker';
 import AgendaSidebar from '@/components/ui/agendasidebar';
 
 import useFirebaseUser from '@/hooks/usefirebaseuser';
@@ -20,13 +17,16 @@ import useAuth from '@/hooks/useauth';
 import useTaskHandlers from '@/hooks/usetaskhandlers';
 import useWeekNav from '@/hooks/useweeknav';
 import useClock from '@/hooks/useclock';
-import { useWindowSize } from '@/hooks/usewindowsize';
+import useWindowSize from '@/hooks/usewindowsize';
 import useConfetti from '@/hooks/useconfetti';
 import useRankBadge from '@/hooks/userankbadge';
 import { getLevelXpInfo, useLevelUp } from '@/hooks/levelxp';
 
 import COLORS from '@/utils/colors';
 import { formatTime, formatDate, generateTimeSlots } from '@/utils/time';
+
+import TaskModal from './TaskModal';
+import ScheduleGrid from './ScheduleGrid';
 
 function App() {
   // firebase
@@ -46,6 +46,7 @@ function App() {
 
   const [selectedDate, setSelectedDate] = useState(new Date()); // day selector for 7-day window top bar
   const selectedDateString = selectedDate.toISOString().split('T')[0]; // formated select date for comparisons (YYYY-MM-DD)
+  const [taskDate, setTaskDate] = useState(new Date(selectedDate)); // use the parent's selectedDate as the default for the new task date
 
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -68,6 +69,7 @@ function App() {
   } = useTaskHandlers({
     tasks,
     setTasks,
+    taskDate,
     selectedDateString,
     setXp,
     isAddingTask,
@@ -87,15 +89,16 @@ function App() {
 
   const currentTier = useRankBadge(level); // get user's rank badge based on level
 
-  const { currentWeekStart, goToNextWeek, goToPreviousWeek } = useWeekNav(); // week navigation hooks
+  const { currentWeekStart, goToNextWeek, goToPreviousWeek } =
+    useWeekNav(setSelectedDate); // week navigation hooks
 
   const timeSlots = generateTimeSlots(); // time slots for the schedule grid
 
-  const getCategoryColor = (category) => { // task cateogory legend managing
+  const getCategoryColor = (category) => {
+    // task cateogory legend managing
     return COLORS.find((c) => c.name === category) || COLORS[0];
   };
 
-  const [taskDate, setTaskDate] = useState(new Date(selectedDate)); // use the parent's selectedDate as the default for the new task date
   const [showCalendar, setShowCalendar] = useState(false); // controls calendar popover visibility
 
   const { xpToNextLevel, levelProgress } = getLevelXpInfo(xp, level); // get XP and level info for bottom display bar
@@ -263,7 +266,7 @@ function App() {
           </div>
 
           {/* Modal Form */}
-          <Modal
+          <TaskModal
             isOpen={isAddingTask || editingTask}
             onClose={() => {
               setIsAddingTask(false);
@@ -276,187 +279,16 @@ function App() {
                 description: '',
               });
             }}
-          >
-            <>
-              <h3
-                className="text-xl font-semibold mb-4 text-mint-300"
-                style={{ color: 'rgb(167, 243, 208)' }}
-              >
-                {editingTask ? 'Edit Task' : 'Add New Task'}
-              </h3>
-
-              {/* Calendar Date Picker */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-1">
-                  Task Date
-                </label>
-                <button
-                  type="button"
-                  onClick={() => setShowCalendar((prev) => !prev)}
-                  className="w-full flex items-center justify-between bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 hover:border-[rgb(167,243,208)] transition-all"
-                >
-                  <span>{taskDate.toDateString()}</span>
-
-                  {/* calendar icon using SVG */}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-[rgb(167,243,208)]"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M6 2a1 1 0 00-1 1v1H3.5A1.5 1.5 0 002 5.5v11A1.5 1.5 0 003.5 18h13a1.5 1.5 0 001.5-1.5v-11A1.5 1.5 0 0016.5 4H15V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zM3.5 6h13a.5.5 0 01.5.5V8H3V6.5a.5.5 0 01.5-.5zm0 3h13v7.5a.5.5 0 01-.5.5h-13a.5.5 0 01-.5-.5V9z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-                {showCalendar && (
-                  <div className="mt-2">
-                    <CalendarPicker
-                      selectedDate={taskDate}
-                      onSelectDate={(date) => {
-                        setTaskDate(date);
-                        setShowCalendar(false);
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                {/* Task Title */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Task Title
-                  </label>
-                  <input
-                    type="text"
-                    value={newTask.title}
-                    onChange={(e) =>
-                      setNewTask((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
-                    placeholder="Enter task title..."
-                  />
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Category
-                  </label>
-                  <select
-                    value={newTask.category}
-                    onChange={(e) =>
-                      setNewTask((prev) => ({
-                        ...prev,
-                        category: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
-                  >
-                    {COLORS.map((color) => (
-                      <option key={color.name} value={color.name}>
-                        {color.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Start Time */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Start Time
-                  </label>
-                  <input
-                    type="time"
-                    value={newTask.startTime}
-                    onChange={(e) =>
-                      setNewTask((prev) => ({
-                        ...prev,
-                        startTime: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
-                  />
-                </div>
-
-                {/* End Time */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    End Time
-                  </label>
-                  <input
-                    type="time"
-                    value={newTask.endTime}
-                    onChange={(e) =>
-                      setNewTask((prev) => ({
-                        ...prev,
-                        endTime: e.target.value,
-                      }))
-                    }
-                    className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
-                  />
-                </div>
-              </div>
-
-              {/* Description */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={newTask.description}
-                  onChange={(e) =>
-                    setNewTask((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
-                  rows="3"
-                  placeholder="Add task description..."
-                />
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3">
-                <Button
-                  onClick={editingTask ? handleUpdateTask : handleAddTask}
-                  className="bg-mint-500 hover:bg-mint-600 text-gray-900 font-semibold px-4 py-2 rounded-lg"
-                  style={{
-                    backgroundColor: 'rgb(167, 243, 208)',
-                    color: 'rgb(17, 24, 39)',
-                  }}
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {editingTask ? 'Update Task' : 'Add Task'}
-                </Button>
-                <Button
-                  onClick={() => {
-                    setIsAddingTask(false);
-                    setEditingTask(null);
-                    setNewTask({
-                      title: '',
-                      startTime: '',
-                      endTime: '',
-                      category: 'Work',
-                      description: '',
-                    });
-                  }}
-                  variant="outline"
-                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Cancel
-                </Button>
-              </div>
-            </>
-          </Modal>
+            editingTask={editingTask}
+            newTask={newTask}
+            setNewTask={setNewTask}
+            handleAddTask={handleAddTask}
+            handleUpdateTask={handleUpdateTask}
+            taskDate={taskDate}
+            setTaskDate={setTaskDate}
+            showCalendar={showCalendar}
+            setShowCalendar={setShowCalendar}
+          />
 
           {/* Day/Week Selector Bar */}
           <div className="flex w-full items-center justify-between px-4">
@@ -497,124 +329,15 @@ function App() {
             </button>
           </div>
 
-          {/* Schedule Grid */}
-          <div className="glass-effect rounded-2xl p-6">
-            <div className="flex items-center gap-2 mb-6">
-              <Calendar
-                className="w-6 h-6 text-mint-300"
-                style={{
-                  color: 'rgb(167, 243, 208)',
-                }}
-              />
-              <h2 className="text-2xl font-semibold text-gray-100">
-                Today's Schedule
-              </h2>
-            </div>
-
-            <div className="space-y-2">
-              {timeSlots.map((time, index) => {
-                const tasksInSlot = getTasksForTimeSlot(time);
-                return (
-                  <motion.div
-                    key={time}
-                    initial={{
-                      opacity: 0,
-                      x: -20,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      x: 0,
-                    }}
-                    transition={{
-                      delay: index * 0.02,
-                    }}
-                    className="time-slot flex items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-800/50 transition-all duration-200"
-                  >
-                    <div className="w-16 text-sm font-mono text-gray-400 flex-shrink-0">
-                      {time}
-                    </div>
-
-                    <div className="flex-1 min-h-[40px] flex items-center gap-2">
-                      {tasksInSlot.length > 0 ? (
-                        tasksInSlot.map((task) => {
-                          const categoryColor = getCategoryColor(task.category);
-                          return (
-                            <motion.div
-                              key={task.id}
-                              layout
-                              initial={{ opacity: 0, scale: 0.95 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.95 }}
-                              transition={{ duration: 0.2 }}
-                              whileHover={{ scale: 1.02 }}
-                              className={`
-                                schedule-block
-                                ${categoryColor.color}
-                                ${task.completed ? 'opacity-70 saturate-50' : ''}
-                                rounded-lg p-3 flex-1 min-w-0 relative group
-                                transition-all duration-300
-                              `}
-                            >
-                              <div className="flex items-center justify-between">
-                                {/* New completion button (left of content) */}
-                                <div className="mr-3">
-                                  <CompleteButton
-                                    completed={task.completed}
-                                    onToggle={() =>
-                                      toggleTaskCompletion(task.id)
-                                    }
-                                  />
-                                </div>
-
-                                <div className="min-w-0 flex-1">
-                                  <h4
-                                    className={`font-semibold truncate ${task.completed ? 'opacity-50 line-through' : 'text-white'}`}
-                                  >
-                                    {task.title}
-                                  </h4>
-                                  <p
-                                    className={`text-xs ${task.completed ? 'opacity-50' : 'text-white/80'}`}
-                                  >
-                                    {task.startTime} - {task.endTime}
-                                  </p>
-                                  {task.description && (
-                                    <p
-                                      className={`text-xs mt-1 truncate ${task.completed ? 'opacity-50' : 'text-white/70'}`}
-                                    >
-                                      {task.description}
-                                    </p>
-                                  )}
-                                </div>
-
-                                <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1 ml-2">
-                                  <button
-                                    onClick={() => handleEditTask(task)}
-                                    className="p-1 hover:bg-white/20 rounded"
-                                  >
-                                    <Edit3 className="w-3 h-3 text-white" />
-                                  </button>
-                                  <button
-                                    onClick={() => handleDeleteTask(task.id)}
-                                    className="p-1 hover:bg-white/20 rounded"
-                                  >
-                                    <Trash2 className="w-3 h-3 text-white" />
-                                  </button>
-                                </div>
-                              </div>
-                            </motion.div>
-                          );
-                        })
-                      ) : (
-                        <div className="text-gray-500 text-sm italic">
-                          No tasks scheduled
-                        </div>
-                      )}
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </div>
+          {/* Schedule Grid/Timetable */}
+          <ScheduleGrid
+            timeSlots={timeSlots}
+            getTasksForTimeSlot={getTasksForTimeSlot}
+            handleEditTask={handleEditTask}
+            handleDeleteTask={handleDeleteTask}
+            toggleTaskCompletion={toggleTaskCompletion}
+            getCategoryColor={getCategoryColor}
+          />
 
           {/* Color Legend */}
           <motion.div
