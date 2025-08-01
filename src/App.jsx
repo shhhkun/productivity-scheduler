@@ -107,9 +107,6 @@ function App() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
 
-  // XP and Streak states [NOT YET IMPLEMENTED LOGIC]
-  const [streak, setStreak] = useState(0); // update firestore fetch to include streak later
-
   if (loadingUserData) {
     //console.log('[Render] Still loading user data...');
     return <div>Loading user data...</div>;
@@ -172,7 +169,7 @@ function App() {
           <title>Productivity Scheduler - Organize Your Day</title>
           <meta
             name="description"
-            content="A beautiful, minimalistic productivity scheduler with color-coded blocks to help you organize your daily tasks and activities."
+            content="A minimalistic productivity scheduler with color-coded blocks to help you organize your daily tasks and activities."
           />
         </HelmetProvider>
         <div className="container mx-auto px-4 py-6 pb-28">
@@ -332,13 +329,12 @@ function App() {
             </div>
 
             {/* Center: XP & Streak */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center w-full max-w-xl px-4">
               <XpStreakDisplay
                 xp={xp}
                 level={level}
                 xpToNextLevel={xpToNextLevel}
                 levelProgress={levelProgress}
-                streak={streak}
               />
             </div>
 
@@ -353,9 +349,9 @@ function App() {
           resetProgress={() => {
             setXp(0);
             setLevel(1);
-            setCurrentTier('');
-            setBadges([]);
-            localStorage.clear();
+            //setCurrentTier('');
+            //setBadges([]);
+            //localStorage.clear();
           }}
           logOut={logOut}
         />
