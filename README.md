@@ -1,7 +1,7 @@
 # 🧠 Productivity App – Dev Log & Roadmap
 
 ## Overview
-A minimalistic productivity tracker featuring a gamified XP and streak system. Designed with animations, intuitive UI, and motivational mechanics.
+A minimalistic productivity tracker featuring a gamified XP and ranking system. Designed with animations, intuitive UI, and motivational mechanics.
 
 ---
 
@@ -50,8 +50,7 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - Fitness/workout plan sidebar
     - Can hold weekly workout split
     - Weight logger/tracker (with graph?)
-- Fix/rework streak logic
-
+- Achievement system
 ---
 
 ## Roadmap
@@ -59,11 +58,10 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - [x] Sticky XP bar w/ responsive layout
 - [x] Achievements & title system (e.g., “Task Apprentice”)
 - [ ] Task history or log view
-- [ ] Optional streak mechanic modes (daily, 3-day/week, etc.)
 - [x] Animation polish (reduce layout shift on reordering)
 - [x] Data persistence via firebase
 - [ ] Mobile responsiveness
-- [ ] Dark mode toggle
+- [ ] Dark/light mode toggles
 - [x] Code cleanup
 
 ---
@@ -73,14 +71,11 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
 - [x] Rank up notification will sometimes persist/stay
     - [x] Potential Cause: large influx of XP at once, de-leveling
     - [x] New Cause: after page refresh, rank up notification is static (likely tied to data persistence) 
-- [ ] Streak counter stuck at 0 days
-    - will be fixed later on once data persistence and user login is implemented
-    - rethinking purpose/necessity of streak counter
+- [x] Streak counter stuck at 0 days
+    - [x] Removed streak counter logic, deemed unnecessary
 
 ## Notes
 
-- XP/streak logic currently only updates on task checkmarks.
-- Streak logic tied to calendar day rollover — better UX needed.
 - Animation tuning ongoing (e.g., card bounce, modal scale)
 - Refactorable code later on:
     - rankbadge.jsx and badgedisplay.jsx were refactored, possibly remove badgedisplay later on
@@ -91,6 +86,8 @@ A minimalistic productivity tracker featuring a gamified XP and streak system. D
     - Order of functions
 - Clean up Login UI
 - Clean up settings/debug menu
+- Optimize firebase read/write op's
+- Hide sensitive errors/info on console.log once app is launched?
 
 ---
 
