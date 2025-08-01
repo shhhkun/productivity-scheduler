@@ -34,7 +34,7 @@ export default function AuthScreen({
     <Box
       sx={{
         minHeight: '100vh',
-        backgroundColor: 'rgb(17, 24, 39)', // Dark blue background
+        backgroundColor: 'var(--bg)', // Dark blue background
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -48,8 +48,8 @@ export default function AuthScreen({
           maxWidth: 420,
           p: 4,
           borderRadius: 3,
-          backgroundColor: 'rgb(31, 41, 55)', // Slightly lighter container
-          color: 'rgb(243, 244, 246)', // Light gray text
+          backgroundColor: 'var(--card-bg)', // Slightly lighter container
+          color: 'var(--text2)', // Light gray text
         }}
       >
         <Typography variant="h5" fontWeight="bold" mb={3}>
@@ -68,17 +68,17 @@ export default function AuthScreen({
               sx={{
                 mb: 3,
                 input: {
-                  color: 'rgb(243, 244, 246)',
+                  color: 'var(--text2)',
                   backgroundColor: 'transparent',
                   '&:-webkit-autofill': {
                     transition: 'background-color 9999s ease-out 0s',
-                    WebkitTextFillColor: 'rgb(243, 244, 246)',
+                    WebkitTextFillColor: 'var(--text2)',
                   },
                 },
                 label: {
                   color: 'rgb(156, 163, 175)',
                   '&.Mui-focused': {
-                    color: 'rgb(167, 243, 208)',
+                    color: 'var(--accent)',
                   },
                 },
                 '& .MuiOutlinedInput-root': {
@@ -86,10 +86,10 @@ export default function AuthScreen({
                     borderColor: 'rgb(75, 85, 99)',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'rgb(167, 243, 208)',
+                    borderColor: 'var(--accent)',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: 'rgb(167, 243, 208)',
+                    borderColor: 'var(--accent)',
                   },
                 },
               }}
@@ -101,13 +101,13 @@ export default function AuthScreen({
               fullWidth
               onClick={handleNext}
               sx={{
-                backgroundColor: 'rgb(167, 243, 208)',
-                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'var(--button-bg)',
+                color: 'var(--text)',
                 fontWeight: 600,
                 textTransform: 'none',
                 mb: 1.5,
                 '&:hover': {
-                  backgroundColor: 'rgb(110, 231, 183)',
+                  backgroundColor: 'var(--hover)',
                 },
               }}
             >
@@ -117,7 +117,7 @@ export default function AuthScreen({
             <Button
               onClick={() => signUp(loginEmail, loginPass)}
               sx={{
-                color: 'rgb(167, 243, 208)',
+                color: 'var(--button-bg)',
                 textTransform: 'none',
                 fontSize: '0.875rem',
               }}
@@ -130,7 +130,7 @@ export default function AuthScreen({
             <Box display="flex" alignItems="center" mb={2}>
               <IconButton
                 onClick={handleBack}
-                sx={{ color: 'rgb(167, 243, 208)' }}
+                sx={{ color: 'var(--button-bg)' }}
               >
                 <ArrowBack />
               </IconButton>
@@ -146,17 +146,17 @@ export default function AuthScreen({
               sx={{
                 mb: 3,
                 input: {
-                  color: 'rgb(243, 244, 246)',
+                  color: 'var(--text2)',
                   backgroundColor: 'transparent',
                   '&:-webkit-autofill': {
                     transition: 'background-color 9999s ease-out 0s',
-                    WebkitTextFillColor: 'rgb(243, 244, 246)',
+                    WebkitTextFillColor: 'var(--text2)',
                   },
                 },
                 label: {
                   color: 'rgb(156, 163, 175)',
                   '&.Mui-focused': {
-                    color: 'rgb(167, 243, 208)',
+                    color: 'var(--accent)',
                   },
                 },
                 '& .MuiOutlinedInput-root': {
@@ -164,10 +164,10 @@ export default function AuthScreen({
                     borderColor: 'rgb(75, 85, 99)',
                   },
                   '&:hover fieldset': {
-                    borderColor: 'rgb(167, 243, 208)',
+                    borderColor: 'var(--accent)',
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: 'rgb(167, 243, 208)',
+                    borderColor: 'var(--accent)',
                   },
                 },
               }}
@@ -176,7 +176,7 @@ export default function AuthScreen({
                   <InputAdornment position="end">
                     <IconButton
                       onClick={() => setShowPassword((prev) => !prev)}
-                      sx={{ color: 'rgb(167, 243, 208)' }}
+                      sx={{ color: 'var(--button-bg)' }}
                     >
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
@@ -191,13 +191,13 @@ export default function AuthScreen({
               fullWidth
               onClick={() => logIn(loginEmail, loginPass)}
               sx={{
-                backgroundColor: 'rgb(167, 243, 208)',
-                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'var(--button-bg)',
+                color: 'var(--text)',
                 fontWeight: 600,
                 textTransform: 'none',
                 mb: 1.5,
                 '&:hover': {
-                  backgroundColor: 'rgb(110, 231, 183)',
+                  backgroundColor: 'var(--hover)',
                 },
               }}
             >
@@ -207,7 +207,7 @@ export default function AuthScreen({
             <Button
               onClick={() => signUp(loginEmail, loginPass)}
               sx={{
-                color: 'rgb(167, 243, 208)',
+                color: 'var(--button-bg)',
                 textTransform: 'none',
                 fontSize: '0.875rem',
               }}

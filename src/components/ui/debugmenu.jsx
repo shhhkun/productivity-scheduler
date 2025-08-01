@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { FaCog } from 'react-icons/fa'; // gear icon
 
-export default function DebugMenu({ addXP, resetProgress, logOut }) {
+export default function DebugMenu({
+  addXP,
+  resetProgress,
+  logOut,
+  theme,
+  setTheme,
+}) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -27,6 +33,17 @@ export default function DebugMenu({ addXP, resetProgress, logOut }) {
           <button style={styles.button} onClick={resetProgress}>
             Reset Progress
           </button>
+
+          {/* Theme toggle buttons */}
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="bg-[var(--card-bg)] text-[var(--text)] border border-[var(--border)] rounded px-3 py-2"
+          >
+            <option value="original">Original</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
 
           {/* logout button */}
           <button style={styles.button} onClick={logOut}>

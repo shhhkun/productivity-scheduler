@@ -12,7 +12,7 @@
   --popover-foreground: 0 0% 98%;
   --primary: 0 0% 98%;
   --primary-foreground: 240 5.9% 10%;
-  --secondary: 240 3.7% 15.9%;
+  --secondary: 240 3.7% 15.9%;  
   --secondary-foreground: 0 0% 98%;
   --muted: 240 3.7% 15.9%;
   --muted-foreground: 240 5% 64.9%;
@@ -95,4 +95,36 @@ body {
 .rdp-chevron {
   stroke: rgb(167, 243, 208);
   fill: rgb(167, 243, 208);
+}
+
+/* Theme styles */
+.theme-original {
+  --bg: rgb(15, 23, 42);
+  --bg2: rgb(29, 36, 54);
+  --text: rgb(30, 41, 59);
+  --text2: rgb(243, 244, 246);
+  --text3: rgb(206, 206, 206);
+  --accent: rgb(167, 243, 208);
+  --card-bg: rgb(30, 41, 59);
+  --button-bg: rgb(167, 243, 208);
+  --border: rgb(55, 65, 81);
+  --hover: rgb(110, 231, 183);
+  --hover2: rgb(53, 65, 97);
+  --test: rgb(224, 24, 101);
+}
+
+.theme-dark {
+  --bg: rgb(10, 10, 20);
+  --text: rgb(240, 240, 240);
+  --accent: rgb(100, 149, 237);
+  --card-bg: rgb(20, 20, 30);
+  --border: rgb(40, 40, 50);
+}
+
+.theme-light {
+  --bg: rgb(255, 255, 255);
+  --text: rgb(30, 30, 30);
+  --accent: rgb(0, 123, 255);
+  --card-bg: rgb(240, 240, 240);
+  --border: rgb(200, 200, 200);
 }

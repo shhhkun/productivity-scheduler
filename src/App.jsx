@@ -107,6 +107,8 @@ function App() {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
 
+  const [theme, setTheme] = useState('original'); // state for alternative (dark, light) themes toggle
+
   if (loadingUserData) {
     //console.log('[Render] Still loading user data...');
     return <div>Loading user data...</div>;
@@ -115,19 +117,21 @@ function App() {
   if (!user) {
     console.log('[Render] No user found. Showing login.');
     return (
-      <AuthScreen
-        loginEmail={loginEmail}
-        setLoginEmail={setLoginEmail}
-        loginPass={loginPass}
-        setLoginPass={setLoginPass}
-        logIn={logIn}
-        signUp={signUp}
-      />
+      <div className={`theme-${theme} min-h-screen`}>
+        <AuthScreen
+          loginEmail={loginEmail}
+          setLoginEmail={setLoginEmail}
+          loginPass={loginPass}
+          setLoginPass={setLoginPass}
+          logIn={logIn}
+          signUp={signUp}
+        />
+      </div>
     );
   }
 
   return (
-    <>
+    <div className={`theme-${theme} min-h-screen`}>
       {/* Confetti effect on level up */}
       <AnimatePresence>
         {showConfetti && (
@@ -164,8 +168,6 @@ function App() {
         </div>
 
         <HelmetProvider>
-          {/*<div className="text-gray-300 mb-2">Welcome, {user.email}</div>*/}
-
           <title>Productivity Scheduler - Organize Your Day</title>
           <meta
             name="description"
@@ -208,8 +210,8 @@ function App() {
               onClick={() => setIsAddingTask(true)}
               className="bg-mint-500 hover:bg-mint-600 text-gray-900 font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
               style={{
-                backgroundColor: 'rgb(167, 243, 208)',
-                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'var(--button-bg)',
+                color: 'var(--text)',
               }}
             >
               <Plus className="w-5 h-5 mr-2" />
@@ -248,8 +250,8 @@ function App() {
             <button
               onClick={goToPreviousWeek}
               style={{
-                backgroundColor: 'rgb(167, 243, 208)',
-                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'var(--button-bg)',
+                color: 'var(--text)',
                 fontWeight: '600',
                 padding: '0.5rem 1rem',
                 borderRadius: '0.75rem',
@@ -270,8 +272,8 @@ function App() {
             <button
               onClick={goToNextWeek}
               style={{
-                backgroundColor: 'rgb(167, 243, 208)',
-                color: 'rgb(17, 24, 39)',
+                backgroundColor: 'var(--button-bg)',
+                color: 'var(--text)',
                 fontWeight: '600',
                 padding: '0.5rem 1rem',
                 borderRadius: '0.75rem',
@@ -349,16 +351,15 @@ function App() {
           resetProgress={() => {
             setXp(0);
             setLevel(1);
-            //setCurrentTier('');
-            //setBadges([]);
-            //localStorage.clear();
           }}
+          theme={theme}
+          setTheme={setTheme}
           logOut={logOut}
         />
 
         <Toaster />
       </div>
-    </>
+    </div>
   );
 }
 

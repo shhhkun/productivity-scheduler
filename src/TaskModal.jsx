@@ -23,21 +23,29 @@ export default function TaskModal({
     <Modal isOpen={isOpen} onClose={onClose}>
       <>
         <h3
-          className="text-xl font-semibold mb-4 text-mint-300"
-          style={{ color: 'rgb(167, 243, 208)' }}
+          className="text-xl font-semibold mb-4"
+          style={{ color: 'var(--accent)' }}
         >
           {editingTask ? 'Edit Task' : 'Add New Task'}
         </h3>
 
         {/* Calendar Date Picker */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-1">
+          <label
+            className="block text-sm font-medium mb-1"
+            style={{ color: 'var(--text3)' }}
+          >
             Task Date
           </label>
           <button
             type="button"
             onClick={() => setShowCalendar((prev) => !prev)}
-            className="w-full flex items-center justify-between bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 hover:border-[rgb(167,243,208)] transition-all"
+            className="w-full border flex items-center justify-between rounded-xl px-3 py-2"
+            style={{
+              color: 'var(--text3)',
+              borderColor: 'var(--border)',
+              backgroundColor: 'var(--bg)',
+            }}
           >
             <span>{taskDate.toDateString()}</span>
 
@@ -71,7 +79,10 @@ export default function TaskModal({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           {/* Task Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: 'var(--text3)' }}
+            >
               Task Title
             </label>
             <input
@@ -83,14 +94,22 @@ export default function TaskModal({
                   title: e.target.value,
                 }))
               }
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
+              className="w-full border rounded-xl px-3 py-2"
+              style={{
+                color: 'var(--text3)',
+                borderColor: 'var(--border)',
+                backgroundColor: 'var(--bg)',
+              }}
               placeholder="Enter task title..."
             />
           </div>
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: 'var(--text3)' }}
+            >
               Category
             </label>
             <select
@@ -101,7 +120,12 @@ export default function TaskModal({
                   category: e.target.value,
                 }))
               }
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
+              className="w-full border rounded-xl px-3 py-2"
+              style={{
+                color: 'var(--text3)',
+                borderColor: 'var(--border)',
+                backgroundColor: 'var(--bg)',
+              }}
             >
               {COLORS.map((color) => (
                 <option key={color.name} value={color.name}>
@@ -113,7 +137,10 @@ export default function TaskModal({
 
           {/* Start Time */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: 'var(--text3)' }}
+            >
               Start Time
             </label>
             <input
@@ -125,13 +152,21 @@ export default function TaskModal({
                   startTime: e.target.value,
                 }))
               }
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
+              className="w-full border rounded-xl px-3 py-2"
+              style={{
+                color: 'var(--text3)',
+                borderColor: 'var(--border)',
+                backgroundColor: 'var(--bg)',
+              }}
             />
           </div>
 
           {/* End Time */}
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
+            <label
+              className="block text-sm font-medium mb-2"
+              style={{ color: 'var(--text3)' }}
+            >
               End Time
             </label>
             <input
@@ -143,14 +178,22 @@ export default function TaskModal({
                   endTime: e.target.value,
                 }))
               }
-              className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
+              className="w-full border rounded-xl px-3 py-2"
+              style={{
+                color: 'var(--text3)',
+                borderColor: 'var(--border)',
+                backgroundColor: 'var(--bg)',
+              }}
             />
           </div>
         </div>
 
         {/* Description */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
+          <label
+            className="block text-sm font-medium mb-2"
+            style={{ color: 'var(--text3)' }}
+          >
             Description (Optional)
           </label>
           <textarea
@@ -161,7 +204,12 @@ export default function TaskModal({
                 description: e.target.value,
               }))
             }
-            className="w-full bg-gray-800 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:border-mint-500 focus:outline-none"
+            className="w-full border rounded-xl px-3 py-2"
+            style={{
+              color: 'var(--text3)',
+              borderColor: 'var(--border)',
+              backgroundColor: 'var(--bg)',
+            }}
             rows="3"
             placeholder="Add task description..."
           />
@@ -171,10 +219,11 @@ export default function TaskModal({
         <div className="flex gap-3">
           <Button
             onClick={editingTask ? handleUpdateTask : handleAddTask}
-            className="bg-mint-500 hover:bg-mint-600 text-gray-900 font-semibold px-4 py-2 rounded-lg"
+            variant="outline"
+            className="border bg-[var(--bg2)] hover:bg-[var(--hover2)] font-semibold px-4 py-2 rounded-xl"
             style={{
-              backgroundColor: 'rgb(167, 243, 208)',
-              color: 'rgb(17, 24, 39)',
+              borderColor: 'var(--border)',
+              color: 'var(--text3)',
             }}
           >
             <Save className="w-4 h-4 mr-2" />
@@ -183,7 +232,11 @@ export default function TaskModal({
           <Button
             onClick={onClose}
             variant="outline"
-            className="border-gray-600 text-gray-300 hover:bg-gray-800"
+            className="border bg-[var(--bg2)] hover:bg-[var(--hover2)] font semi-bold px-4 py-2 rounded-xl"
+            style={{
+              borderColor: 'var(--border)',
+              color: 'var(--text3)',
+            }}
           >
             <X className="w-4 h-4 mr-2" />
             Cancel
