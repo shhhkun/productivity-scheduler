@@ -15,16 +15,16 @@ export default function DebugMenu({ addXP, resetProgress, logOut }) {
       {isOpen && (
         <div style={styles.panel}>
           <h3 style={styles.heading}>Debug Menu</h3>
-          <button className="debug-button" onClick={() => addXP(10)}>
+          <button style={styles.button} onClick={() => addXP(10)}>
             +10 XP
           </button>
-          <button className="debug-button" onClick={() => addXP(50)}>
+          <button style={styles.button} onClick={() => addXP(10)}>
             +100 XP
           </button>
-          <button className="debug-button" onClick={() => addXP(100)}>
+          <button style={styles.button} onClick={() => addXP(500)}>
             +500 XP
           </button>
-          <button className="debug-button" onClick={resetProgress}>
+          <button style={styles.button} onClick={resetProgress}>
             Reset Progress
           </button>
 
@@ -57,24 +57,23 @@ const styles = {
   },
   panel: {
     marginTop: '2rem',
-    background: '#1e1e1e', // dark panel background
+    background: 'rgb(17, 24, 39)', // dark panel background
     padding: '1rem',
-    border: '1px solid #333',
+    border: '2px solid rgb(120,130,140)', // mint border
     borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.6)',
     display: 'flex',
     flexDirection: 'column',
     gap: '0.5rem',
   },
   heading: {
     margin: 0,
-    color: '#ccc',
+    color: 'rgb(167, 243, 208)',
     fontSize: '1rem',
     borderBottom: '1px solid #444',
     paddingBottom: '0.5rem',
   },
   button: {
-    background: '#333',
+    background: 'rgb(17, 24, 39)',
     color: '#ccc',
     border: '1px solid #555',
     padding: '0.5rem',
