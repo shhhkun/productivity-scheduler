@@ -53,12 +53,12 @@ const AgendaSidebar = ({
         transition-colors duration-300 ease-in-out
         ${
           isOpen
-            ? 'bg-[rgb(17,24,39)] border-[rgb(120,130,140)]'
-            : 'bg-[rgb(167,243,208)] border-[rgb(167,243,208)]'
+            ? 'bg-[var(--bg)] border-[var(--hover2)]'
+            : 'bg-[var(--button-bg)] border-[var(--button-bg  )]'
         }
-        text-[rgb(200,200,210)]
         shadow-md p-2 flex flex-col z-50
       `}
+      style={{ color: 'var(--text3)' }}
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -73,8 +73,8 @@ const AgendaSidebar = ({
           focus:outline-none focus:ring-0 focus:bg-transparent active:bg-transparent
           ${
             isOpen
-              ? 'bg-[rgb(28,35,50)] text-[rgb(167,243,208)] hover:text-[rgb(140,220,190)]'
-              : 'bg-[rgb(167,243,208)] text-[rgb(17,24,39)] hover:text-[rgb(50,80,70)]'
+              ? 'text-[var(--accent)] hover:text-[var(--hover)]'
+              : 'text-[var(--text)] hover:text-[var(--hover2)]'
           }
           select-none
           `}
@@ -96,14 +96,14 @@ const AgendaSidebar = ({
     flex flex-col transition-colors duration-200
     ${
       entry.isSelected
-        ? 'bg-[rgb(28,35,50)] text-[rgb(167,243,208)] font-semibold'
-        : 'text-[rgb(180,180,190)] hover:bg-[rgb(60,65,75)]'
+        ? 'bg-[var(--bg2)] text-[var(--accent)] font-semibold'
+        : 'text-[var(--text4))] hover:bg-[var(--hover2)]'
     }
   `}
             >
               <div className="flex justify-between items-center">
                 <span>{entry.day}</span>
-                <span className="flex items-center gap-2 text-[rgb(120,140,160)]">
+                <span className="flex items-center gap-2 text-[var(--text4)]">
                   {entry.date}
                   {entry.incompleteCount > 0 && (
                     <span
@@ -118,7 +118,7 @@ const AgendaSidebar = ({
 
               {/* Render tasks under the date */}
               {entry.tasksForDay.length > 0 && (
-                <ul className="mt-1 pl-4 max-h-20 overflow-y-auto text-xs text-[rgb(180,180,190)]">
+                <ul className="mt-1 pl-4 max-h-20 overflow-y-auto text-xs text-[var(--text3)]">
                   {entry.tasksForDay
                     .filter((task) => !task.completed) // <- filter out completed tasks
                     .sort((a, b) => {
@@ -161,7 +161,7 @@ const AgendaSidebar = ({
                           ></span>
                           <span>{task.title}</span>
                           {formattedTime && (
-                            <span className="ml-auto text-[rgb(120,140,160)]">
+                            <span className="ml-auto text-[var(--text4)]">
                               {formattedTime}
                             </span>
                           )}

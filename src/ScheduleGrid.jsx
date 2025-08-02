@@ -14,12 +14,15 @@ export default function ScheduleGrid({
     <div className="glass-effect rounded-2xl p-6">
       <div className="flex items-center gap-2 mb-6">
         <Calendar
-          className="w-6 h-6 text-mint-300"
+          className="w-6 h-6"
           style={{
-            color: 'rgb(167, 243, 208)',
+            color: 'var(--accent)',
           }}
         />
-        <h2 className="text-2xl font-semibold text-gray-100">
+        <h2
+          className="text-2xl font-semibold"
+          style={{ color: 'var(--text2)' }}
+        >
           Today's Schedule
         </h2>
       </div>
@@ -41,9 +44,12 @@ export default function ScheduleGrid({
               transition={{
                 delay: index * 0.02,
               }}
-              className="time-slot flex items-center gap-4 py-2 px-4 rounded-lg hover:bg-gray-800/50 transition-all duration-200"
+              className="time-slot flex items-center gap-4 py-2 px-4 rounded-lg hover:bg-[var(--hover2)] transition-all duration-200"
             >
-              <div className="w-16 text-sm font-mono text-gray-400 flex-shrink-0">
+              <div
+                className="w-16 text-sm font-mono text-gray-400 flex-shrink-0"
+                style={{ color: 'var(--text2)' }}
+              >
                 {time}
               </div>
 
@@ -116,7 +122,10 @@ export default function ScheduleGrid({
                     );
                   })
                 ) : (
-                  <div className="text-gray-500 text-sm italic">
+                  <div
+                    className="text-sm italic"
+                    style={{ color: 'var(--text4)' }}
+                  >
                     No tasks scheduled
                   </div>
                 )}

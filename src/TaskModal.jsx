@@ -52,7 +52,7 @@ export default function TaskModal({
             {/* calendar icon using SVG */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5 text-[rgb(167,243,208)]"
+              className="h-5 w-5 text-[var(--accent)]"
               viewBox="0 0 20 20"
               fill="currentColor"
             >

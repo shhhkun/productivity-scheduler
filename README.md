@@ -61,7 +61,20 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
 - [x] Animation polish (reduce layout shift on reordering)
 - [x] Data persistence via firebase
 - [ ] Mobile responsiveness
-- [ ] Dark/light mode toggles
+- [ ] Dark/light mode toggle (list):
+    - [ ] App
+    - [x] AuthScreen
+    - [x] TaskModal
+    - [x] ScheduleGrid (may change default white color for actual task div blocks)
+    - Components
+        - [x] agendasidebar
+        - [ ] calendarpicker
+        - [ ] completebutton
+        - [ ] dayselectorbar
+        - [ ] debugmenu
+        - [ ] modal
+        - [ ] rankbadge
+        - [ ] xpstreakdisplay
 - [x] Code cleanup
 
 ---
