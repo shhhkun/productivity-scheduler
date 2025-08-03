@@ -6,7 +6,7 @@ export default function CompleteButton({ completed, onToggle }) {
     <button
       onClick={onToggle}
       className={`w-5 h-5 flex items-center justify-center rounded-full border transition-all duration-200 
-    ${completed ? 'border-mint-300 bg-mint-300/20' : 'border-white/50 hover:border-mint-300'}`}
+    ${completed ? 'border-[var(--accent)] bg-[var(--accent)]/20' : 'border-[var(--border)] hover:border-[var(--accent)]'}`}
     >
       <AnimatePresence>
         {completed && (
@@ -17,7 +17,7 @@ export default function CompleteButton({ completed, onToggle }) {
             exit={{ opacity: 0, scale: 0.6 }}
             transition={{ duration: 0.2 }}
           >
-            <Check className="w-3 h-3 text-mint-300" />
+            <Check className="w-3 h-3 text-[var(--accent)]" />
           </motion.div>
         )}
       </AnimatePresence>
