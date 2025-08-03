@@ -68,7 +68,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
     - [x] ScheduleGrid (may change default white color for actual task div blocks)
     - Components
         - [x] agendasidebar
-        - [ ] calendarpicker
+        - [x] calendarpicker
         - [ ] completebutton
         - [ ] dayselectorbar
         - [ ] debugmenu
