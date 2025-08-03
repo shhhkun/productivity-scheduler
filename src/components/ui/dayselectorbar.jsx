@@ -1,11 +1,14 @@
-import React from 'react';
 import { format, addDays } from 'date-fns';
 
 export default function DaySelectorBar({ selectedDate, setSelectedDate, currentWeekStart }) {
     const days = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
     return (
-        <div className="flex justify-between px-2 py-2 bg-gray-900 rounded-full mb-2 shadow-sm">
+        <div className="flex justify-between px-2 py-2 rounded-full mb-2 shadow-sm"
+            style={{
+                backgroundColor: 'var(--bg)'
+            }}
+        >
             {days.map((day, idx) => {
                 const isSelected = format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd');
 
@@ -14,13 +17,13 @@ export default function DaySelectorBar({ selectedDate, setSelectedDate, currentW
                         key={idx}
                         onClick={() => setSelectedDate(day)}
                         className={`flex-1 text-center py-2 mx-1 rounded-full transition-all text-sm font-medium
-                            ${isSelected 
-                                ? '' 
-                                : 'hover:bg-gray-800'}
+                            ${isSelected
+                                ? ''
+                                : 'hover:bg-[var(--hover2)]'}
                         `}
                         style={{
-                            backgroundColor: isSelected ? 'rgb(167, 243, 208)' : 'transparent',
-                            color: isSelected ? 'rgb(17, 24, 39)' : 'rgb(255, 255, 255)',
+                            backgroundColor: isSelected ? 'var(--button-bg)' : 'transparent',
+                            color: isSelected ? 'var(--text)' : 'var(--text2)',
                         }}
                     >
                         <div>{format(day, 'EEE')}</div>

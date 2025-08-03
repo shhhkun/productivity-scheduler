@@ -69,7 +69,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
     - Components
         - [x] agendasidebar
         - [x] calendarpicker
-        - [ ] completebutton
+        - [x] completebutton (still need to fix '< >' logic in index.css)
         - [ ] dayselectorbar
         - [ ] debugmenu
         - [ ] modal
