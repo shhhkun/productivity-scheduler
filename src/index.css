@@ -3,6 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* fallback for Tailwind CSS */
 :root {
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
@@ -32,8 +33,8 @@ body {
 
 .glass-effect {
   backdrop-filter: blur(10px);
-  background: rgba(31, 41, 55, 0.8);
-  border: 1px solid rgba(75, 85, 99, 0.3);
+  background: var(--glass-bg, rgba(31, 41, 55, 0.8)); /* fallback */
+  border: 1px solid var(--glass-border, rgba(75, 85, 99, 0.3)); /* fallback */
 }
 
 .mint-glow {
@@ -112,6 +113,12 @@ body {
   --hover: rgb(110, 231, 183);
   --hover2: rgb(53, 65, 97);
   --test: rgb(224, 24, 101);
+  --toast-bg: rgb(30, 41, 59);
+  --toast-text: rgb(243, 244, 246);
+  --toast-border: rgb(55, 65, 81);
+  --toast-ring: rgb(167, 243, 208);
+  --glass-bg: rgba(31, 41, 55, 0.8);
+  --glass-border: rgba(75, 85, 99, 0.3);
 }
 
 .theme-dark {

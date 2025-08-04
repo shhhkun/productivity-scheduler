@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FaCog } from 'react-icons/fa'; // gear icon
+import { toast } from '@/components/ui/use-toast';
 
 export default function DebugMenu({
   addXP,
@@ -32,6 +33,32 @@ export default function DebugMenu({
           </button>
           <button style={styles.button} onClick={resetProgress}>
             Reset Progress
+          </button>
+
+          <button
+            onClick={() =>
+              toast({
+                title: 'Debug Toast',
+                description:
+                  'This is a test notification triggered from DebugMenu.',
+              })
+            }
+            className="debug-button"
+          >
+            Trigger Toast
+          </button>
+
+          <button
+            onClick={() =>
+              toast({
+                title: 'Error',
+                description: 'Something went wrong!',
+                variant: 'destructive',
+              })
+            }
+            className="debug-button"
+          >
+            Trigger Error Toast
           </button>
 
           {/* Theme toggle buttons */}

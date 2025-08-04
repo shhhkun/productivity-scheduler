@@ -157,7 +157,12 @@ function App() {
         )}
       </AnimatePresence>
 
-      <div className="min-h-screen bg-gray-900 text-gray-100 overflow-x-hidden">
+      <div
+        className="min-h-screen overflow-x-hidden"
+        style={{
+          backgroundColor: 'var(--bg)',
+        }}
+      >
         <div className="flex">
           <AgendaSidebar
             tasks={tasks}
@@ -188,18 +193,37 @@ function App() {
             className="text-center mb-8"
           >
             <div className="glass-effect rounded-2xl p-6 mb-4 mint-glow">
-              <div className="digital-clock text-4xl md:text-6xl font-bold text-mint-300 mb-2">
+              <div
+                className="digital-clock text-4xl md:text-6xl font-bold mb-2"
+                style={{
+                  color: 'var(--text2)',
+                }}
+              >
                 {formatTime(currentTime)}
               </div>
-              <div className="text-gray-400 text-lg">
+              <div
+                className="text-lg"
+                style={{
+                  color: 'var(--text3)',
+                }}
+              >
                 {formatDate(currentTime)}
               </div>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-100 mb-2">
+            <h1
+              className="text-3xl md:text-4xl font-bold mb-2"
+              style={{
+                color: 'var(--text2)',
+              }}
+            >
               Productivity Scheduler
             </h1>
-            <p className="text-gray-400">
+            <p
+              style={{
+                color: 'var(--text3)',
+              }}
+            >
               Organize your day with color-coded time blocks
             </p>
           </motion.div>
@@ -208,7 +232,7 @@ function App() {
           <div className="flex justify-center mb-6">
             <Button
               onClick={() => setIsAddingTask(true)}
-              className="bg-mint-500 hover:bg-mint-600 text-gray-900 font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
+              className="font-semibold px-6 py-3 rounded-xl transition-all duration-300 hover:scale-105"
               style={{
                 backgroundColor: 'var(--button-bg)',
                 color: 'var(--text)',
@@ -308,14 +332,19 @@ function App() {
             }}
             className="glass-effect rounded-2xl p-6 mt-6"
           >
-            <h3 className="text-lg font-semibold text-gray-100 mb-4">
+            <h3
+              className="text-lg font-semibold mb-4"
+              style={{
+                color: 'var(--text2)',
+              }}
+            >
               Color Categories
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
               {COLORS.map((color) => (
                 <div key={color.name} className="flex items-center gap-2">
                   <div className={`w-4 h-4 rounded ${color.color}`}></div>
-                  <span className="text-sm text-gray-300">{color.name}</span>
+                  <span className="text-sm text-[var(--text3)]">{color.name}</span>
                 </div>
               ))}
             </div>
@@ -323,7 +352,10 @@ function App() {
         </div>
 
         {/* Sticky XP/Streak/Badge Display */}
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-gray-900 border-t border-gray-700 shadow-inner px-4 py-3">
+        <div className="fixed bottom-0 left-0 w-full z-50 border-t border-[var(--border)] shadow-inner px-4 py-3"
+        style={{
+          backgroundColor: 'var(--bg)'
+        }}>
           <div className="relative flex items-center justify-between w-full min-h-[72px]">
             {/* Left: Badge */}
             <div className="flex items-center h-full">
