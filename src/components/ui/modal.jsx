@@ -1,5 +1,3 @@
-// implement modal transition/popup of add task form
-import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Modal({ isOpen, onClose, children }) {
@@ -18,7 +16,10 @@ export default function Modal({ isOpen, onClose, children }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className="bg-gray-900 rounded-xl shadow-xl max-w-2xl w-full p-6 relative z-10"
+            className="rounded-xl shadow-xl max-w-2xl w-full p-6 relative z-10"
+            style={{
+              backgroundColor: 'var(--bg)'
+            }}
           >
             {children}
           </motion.div>

@@ -55,7 +55,7 @@ export default function RankBadge({ tier, userDataLoaded }) {
     };
   }, []);
 
-  const style = tierStyles[tier] || 'text-white';
+  const style = tierStyles[tier] || 'border-[var(--bg)]';
   const title = tierTitles[tier] || '';
 
   return (
@@ -69,7 +69,11 @@ export default function RankBadge({ tier, userDataLoaded }) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: -10 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
-            className="fixed bottom-24 inset-x-0 mx-auto w-fit text-center bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold px-4 py-2 rounded-full shadow-lg ring-2 ring-purple-300 z-50"
+            className="fixed bottom-24 inset-x-0 mx-auto w-fit text-center border border-[var(--accent)] font-bold px-4 py-2 rounded-full shadow-lg z-50"
+            style={{ 
+              backgroundColor: 'var(--bg)',
+              color: 'var(--text3)',
+            }}
           >
             🎉 Rank Up to {tier}!
           </motion.div>
@@ -92,7 +96,13 @@ export default function RankBadge({ tier, userDataLoaded }) {
       </motion.div>
 
       {/* Title Below Badge */}
-      <div className="mt-1 text-xs italic text-gray-400">{title}</div>
+      <div className="mt-1 text-xs italic text-gray-400"
+      style={{
+        color: 'var(--text3)'  
+      }}
+      >
+        {title}
+      </div>
     </div>
   );
 }
