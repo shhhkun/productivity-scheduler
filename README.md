@@ -71,7 +71,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
         - [x] calendarpicker
         - [x] completebutton (still need to fix '< >' logic in index.css)
         - [x] dayselectorbar
-        - [ ] debugmenu
+        - [x] debugmenu (should clean up animations, and refactor into proper settings menu)
         - [ ] modal
         - [ ] rankbadge
         - [ ] xpstreakdisplay

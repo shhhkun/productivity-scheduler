@@ -38,7 +38,11 @@ export default function DebugMenu({
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
-            className="bg-[var(--card-bg)] text-[var(--text)] border border-[var(--border)] rounded px-3 py-2"
+            className="border border-[var(--hover2)] rounded px-3 py-2"
+            style={{
+              backgroundColor: 'var(--bg)',
+              color: 'var(--text3)',
+            }}
           >
             <option value="original">Original</option>
             <option value="dark">Dark</option>
@@ -74,9 +78,9 @@ const styles = {
   },
   panel: {
     marginTop: '2rem',
-    background: 'rgb(17, 24, 39)', // dark panel background
+    background: 'var(--bg)', // dark panel background
     padding: '1rem',
-    border: '2px solid rgb(120,130,140)', // mint border
+    border: '2px solid var(--hover2)', // mint border
     borderRadius: '8px',
     display: 'flex',
     flexDirection: 'column',
@@ -84,15 +88,16 @@ const styles = {
   },
   heading: {
     margin: 0,
-    color: 'rgb(167, 243, 208)',
+    color: 'var(--accent)',
     fontSize: '1rem',
-    borderBottom: '1px solid #444',
+    fontWeight: 'medium',
+    borderBottom: '1px solid var(--hover2)',
     paddingBottom: '0.5rem',
   },
   button: {
-    background: 'rgb(17, 24, 39)',
-    color: '#ccc',
-    border: '1px solid #555',
+    background: 'var(--bg)',
+    color: 'var(--text3)',
+    border: '1px solid var(--hover2)',
     padding: '0.5rem',
     borderRadius: '4px',
     cursor: 'pointer',

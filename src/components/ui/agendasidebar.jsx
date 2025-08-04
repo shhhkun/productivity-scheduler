@@ -54,7 +54,7 @@ const AgendaSidebar = ({
         ${
           isOpen
             ? 'bg-[var(--bg)] border-[var(--hover2)]'
-            : 'bg-[var(--button-bg)] border-[var(--button-bg  )]'
+            : 'bg-[var(--button-bg)] border-[var(--button-bg)]'
         }
         shadow-md p-2 flex flex-col z-50
       `}
