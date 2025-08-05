@@ -92,6 +92,24 @@ body {
   background: #444;
 }
 
+/* Caption (month + year) */
+.rdp-caption_label {
+  color: var(--text2);
+  font-weight: 500;
+}
+
+/* Weekday header (Su, Mo, ...) */
+.rdp-weekday {
+  color: var(--text4);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+/* Day buttons (number grid) */
+.rdp-day_button {
+  color: var(--text3);
+}
+
 /* Calendar arrow nav styles */
 .rdp-chevron {
   stroke: var(--accent, rgb(167, 243, 208));

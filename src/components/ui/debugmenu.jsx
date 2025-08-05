@@ -74,9 +74,9 @@ export default function DebugMenu({
             }}
           >
             <option value="original">Original</option>
-            <option value="dark">Dark</option>
+            {/*<option value="dark">Dark</option>*/}
             <option value="dark2">Dark2</option>
-            <option value="light">Light</option>
+            {/*<option value="light">Light</option>*/}
             <option value="light2">Light2</option>
           </select>
 
@@ -109,9 +109,9 @@ const styles = {
   },
   panel: {
     marginTop: '2rem',
-    background: 'var(--bg)', // dark panel background
+    background: 'var(--bg)',
     padding: '1rem',
-    border: '2px solid var(--hover2)', // mint border
+    border: '2px solid var(--hover2)',
     borderRadius: '8px',
     display: 'flex',
     flexDirection: 'column',
