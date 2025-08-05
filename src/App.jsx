@@ -124,7 +124,6 @@ function App() {
   }
 
   if (!user) {
-    console.log('[Render] No user found. Showing login.');
     return (
       <div className={`theme-${theme} min-h-screen`}>
         <AuthScreen

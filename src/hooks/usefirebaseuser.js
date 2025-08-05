@@ -24,7 +24,6 @@ export default function useFirebaseUser() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setLoadingUserData(true); // set loading before fetch
-      console.log('[AuthState] Changed:', user); // Check if user is null or populated
 
       if (user) {
         setUser(user);
@@ -34,11 +33,6 @@ export default function useFirebaseUser() {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists()) {
           const data = userSnap.data();
-
-          console.log('[Fetched from Firestore]', {
-            xp: data.xp,
-            level: data.level,
-          });
 
           setXp(data.xp ?? 0);
           setLevel(data.level ?? 1);
@@ -105,11 +99,9 @@ export default function useFirebaseUser() {
         if (tasksOnDate.length === 0) {
           // if no tasks for this date, delete the doc
           await deleteDoc(taskDocRef);
-          console.log(`[Firestore] Deleted empty task doc for date ${date}`);
         } else {
           // otherwise save/update the doc
           await setDoc(taskDocRef, { tasks: tasksOnDate }, { merge: true });
-          console.log(`[Firestore] Updated tasks for date ${date}`);
         }
       }
     }, 1000),
@@ -119,7 +111,6 @@ export default function useFirebaseUser() {
   useEffect(() => {
     if (!user || loadingUserData) return;
 
-    console.log('[SaveTasks] Triggered with tasks:', tasks);
     saveAllTasks(tasks, user); // debounce call
   }, [tasks, user, loadingUserData]);
 
