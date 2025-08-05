@@ -41,6 +41,8 @@ function App() {
     setTasks,
     userDataLoaded,
     loadingUserData,
+    theme,
+    setTheme,
   } = useFirebaseUser();
 
   const { signUp, logIn, logOut } = useAuth();
@@ -106,8 +108,6 @@ function App() {
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPass, setLoginPass] = useState('');
-
-  const [theme, setTheme] = useState('original'); // state for alternative (dark, light) themes toggle
 
   if (loadingUserData) {
     return (

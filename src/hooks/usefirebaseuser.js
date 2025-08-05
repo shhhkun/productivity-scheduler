@@ -19,6 +19,7 @@ export default function useFirebaseUser() {
   const [tasks, setTasks] = useState([]);
   const [loadingUserData, setLoadingUserData] = useState(false);
   const [userDataLoaded, setUserDataLoaded] = useState(false);
+  const [theme, setTheme] = useState('original');
 
   // firebase useEffects
   useEffect(() => {
@@ -36,6 +37,7 @@ export default function useFirebaseUser() {
 
           setXp(data.xp ?? 0);
           setLevel(data.level ?? 1);
+          setTheme(data.theme ?? 'original'); // fallback to 'original' if not set
         }
 
         // fetch tasks
@@ -59,6 +61,7 @@ export default function useFirebaseUser() {
         setUser(null);
         setXp(0);
         setLevel(1);
+        setTheme('original');
         setTasks([]);
         setLoadingUserData(false);
         setUserDataLoaded(false); // reset user data loaded
@@ -114,7 +117,12 @@ export default function useFirebaseUser() {
     saveAllTasks(tasks, user); // debounce call
   }, [tasks, user, loadingUserData]);
 
-  useEffect(() => {}, []); // dummy effect
+  useEffect(() => {
+    if (!user || loadingUserData) return;
+
+    const userRef = doc(db, 'users', user.uid);
+    updateDoc(userRef, { theme }).catch(console.error);
+  }, [theme, user, loadingUserData]);
 
   return {
     user,
@@ -126,5 +134,7 @@ export default function useFirebaseUser() {
     setTasks,
     userDataLoaded,
     loadingUserData,
+    theme,
+    setTheme,
   };
 }
