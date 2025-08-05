@@ -46,7 +46,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
 - General UI polish
 - Dark/light mode toggles
 
-### *v1.5 - Next**
+### *v1.5 - Upcoming/Next**
 - Fitness/workout plan sidebar
     - Can hold weekly workout split
     - Weight logger/tracker (with graph?)
@@ -57,7 +57,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
 
 - [x] Sticky XP bar w/ responsive layout
 - [x] Achievements & title system (e.g., “Task Apprentice”)
-- [ ] Task history or log view
+- [x] Task overview
 - [x] Animation polish (reduce layout shift on reordering)
 - [x] Data persistence via firebase
 - [ ] Mobile responsiveness
@@ -101,7 +101,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
 - Clean up Login UI
 - Clean up settings/debug menu
 - Optimize firebase read/write op's
-- Hide sensitive errors/info on console.log once app is launched?
+- Hide sensitive errors/info on console.log
 
 ---
 
