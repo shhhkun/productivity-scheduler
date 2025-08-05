@@ -146,33 +146,6 @@ body {
 }
 
 .theme-dark {
-  --bg: rgb(12, 12, 17); /* very dark base */
-  --bg2: rgb(20, 20, 30); /* slightly lighter alt bg */
-
-  --text: rgb(240, 240, 240); /* light for main text */
-  --text2: rgb(220, 220, 220); /* for important headers */
-  --text3: rgb(160, 160, 160); /* muted mid-gray */
-  --text4: rgb(107, 114, 128); /* lowest text tier */
-
-  --accent: rgb(220, 38, 38); /* rich crimson */
-  --glow: rgb(141, 20, 20);
-  --card-bg: rgb(20, 20, 30); /* dark card bg */
-  --button-bg: rgb(185, 28, 28); /* deeper red */
-
-  --border: rgb(40, 40, 50); /* soft border */
-  --hover: rgb(239, 68, 68); /* vibrant red hover */
-  --hover2: rgb(64, 64, 80); /* muted hover for gray stuff */
-
-  --toast-bg: rgb(20, 20, 30);
-  --toast-text: rgb(240, 240, 240);
-  --toast-border: rgb(60, 60, 75);
-  --toast-ring: rgb(239, 68, 68);
-
-  --glass-bg: rgba(30, 30, 40, 0.85);
-  --glass-border: rgba(100, 100, 120, 0.2);
-}
-
-.theme-dark2 {
   --bg: rgb(10, 10, 10); /* absolute black */
   --bg2: rgb(20, 20, 20); /* dark gray for contrast */
 
@@ -200,33 +173,6 @@ body {
 }
 
 .theme-light {
-  --bg: rgb(248, 250, 252); /* main background, off-white */
-  --bg2: rgb(233, 236, 239); /* alt background (cards etc.) */
-
-  --text: rgb(30, 41, 59); /* main text, navy-gray */
-  --text2: rgb(17, 24, 39); /* slightly darker for headers */
-  --text3: rgb(75, 85, 99); /* muted dark-gray */
-  --text4: rgb(107, 114, 128); /* least important gray */
-
-  --accent: rgb(20, 184, 166); /* teal-green (mint, reused) */
-  --glow: rgb(122, 228, 215);
-  --card-bg: rgb(255, 255, 255); /* white cards */
-  --button-bg: rgb(167, 243, 208); /* light mint bg for buttons */
-
-  --border: rgb(209, 213, 219); /* light border gray */
-  --hover: rgb(190, 242, 230); /* mint hover */
-  --hover2: rgb(229, 231, 235); /* light bg hover gray */
-
-  --toast-bg: rgb(255, 255, 255);
-  --toast-text: rgb(30, 41, 59);
-  --toast-border: rgb(209, 213, 219);
-  --toast-ring: rgb(20, 184, 166);
-
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(200, 200, 200, 0.3);
-}
-
-.theme-light2 {
   --bg: rgb(245, 245, 250); /* softer white */
   --bg2: rgb(230, 230, 240); /* visible separation for cards */
 
