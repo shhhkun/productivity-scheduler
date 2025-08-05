@@ -36,6 +36,7 @@ export default function DebugMenu({
           </button>
 
           <button
+            style={styles.button}
             onClick={() =>
               toast({
                 title: 'Debug Toast',
@@ -49,6 +50,7 @@ export default function DebugMenu({
           </button>
 
           <button
+            style={styles.button}
             onClick={() =>
               toast({
                 title: 'Error',
@@ -73,7 +75,9 @@ export default function DebugMenu({
           >
             <option value="original">Original</option>
             <option value="dark">Dark</option>
+            <option value="dark2">Dark2</option>
             <option value="light">Light</option>
+            <option value="light2">Light2</option>
           </select>
 
           {/* logout button */}

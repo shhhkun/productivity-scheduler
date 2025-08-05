@@ -110,8 +110,17 @@ function App() {
   const [theme, setTheme] = useState('original'); // state for alternative (dark, light) themes toggle
 
   if (loadingUserData) {
-    //console.log('[Render] Still loading user data...');
-    return <div>Loading user data...</div>;
+    return (
+      <div
+        className={`theme-${theme} min-h-screen`}
+        style={{
+          backgroundColor: 'var(--bg)',
+          color: 'var(--text)'
+        }}
+      >
+        Loading user data...
+      </div>
+    );
   }
 
   if (!user) {
@@ -344,7 +353,9 @@ function App() {
               {COLORS.map((color) => (
                 <div key={color.name} className="flex items-center gap-2">
                   <div className={`w-4 h-4 rounded ${color.color}`}></div>
-                  <span className="text-sm text-[var(--text3)]">{color.name}</span>
+                  <span className="text-sm text-[var(--text3)]">
+                    {color.name}
+                  </span>
                 </div>
               ))}
             </div>
@@ -352,10 +363,12 @@ function App() {
         </div>
 
         {/* Sticky XP/Streak/Badge Display */}
-        <div className="fixed bottom-0 left-0 w-full z-50 border-t border-[var(--border)] shadow-inner px-4 py-3"
-        style={{
-          backgroundColor: 'var(--bg)'
-        }}>
+        <div
+          className="fixed bottom-0 left-0 w-full z-50 border-t border-[var(--border)] shadow-inner px-4 py-3"
+          style={{
+            backgroundColor: 'var(--bg)',
+          }}
+        >
           <div className="relative flex items-center justify-between w-full min-h-[72px]">
             {/* Left: Badge */}
             <div className="flex items-center h-full">

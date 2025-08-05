@@ -44,7 +44,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
     - Task and storage persistence with Firebase Database
     - Host the app using Firebase for public access
 - General UI polish
-- Dark/light mode toggle
+- Dark/light mode toggles
 
 ### *v1.5 - Next**
 - Fitness/workout plan sidebar
@@ -61,8 +61,8 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
 - [x] Animation polish (reduce layout shift on reordering)
 - [x] Data persistence via firebase
 - [ ] Mobile responsiveness
-- [ ] Dark/light mode toggle (list):
-    - [ ] App
+- [x] Dark/light mode toggle (list):
+    - [x] App
     - [x] AuthScreen
     - [x] TaskModal
     - [x] ScheduleGrid (may change default white color for actual task div blocks)
@@ -75,7 +75,7 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
         - [x] modal
         - [x] rankbadge
         - [x] xpstreakdisplay
-        - [] toast/toaster
+        - [x] toast/toaster
 - [x] Code cleanup
 
 ---
