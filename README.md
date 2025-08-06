@@ -1,7 +1,9 @@
-# 🧠 Productivity App – Dev Log & Roadmap
+# Productivity App – Dev Log & Roadmap
 
 ## Overview
 A minimalistic productivity tracker featuring a gamified XP and ranking system. Designed with animations, intuitive UI, and motivational mechanics.
+
+[**Live Demo**](https://productivityapp-eb15a.web.app/)
 
 ---
 
@@ -109,4 +111,4 @@ A minimalistic productivity tracker featuring a gamified XP and ranking system. 
 
 Project by **Serjo Barron**  
 Built with:  
-`React` • `TailwindCSS` • `Framer Motion`
+`React` • `TailwindCSS` • `Framer Motion` • `Vite` • `TailwindCSS` • `Framer Motion` • `Firebase Authentication` • `Firestore` • `Firebase Hosting` • `React Icons` • `React Calendar`
