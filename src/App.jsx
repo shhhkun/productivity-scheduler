@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
+import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import Confetti from 'react-confetti';
@@ -180,13 +180,13 @@ function App() {
           />
         </div>
 
-        <HelmetProvider>
-          <title>Productivity Scheduler - Organize Your Day</title>
+        <Helmet>
+          <title>Kept - A Minimalistic Productivity Scheduler</title>
           <meta
             name="description"
-            content="A minimalistic productivity scheduler with color-coded blocks to help you organize your daily tasks and activities."
+            content="Kept is a minimalist productivity scheduler with gamified XP, intuitive UI, and daily organization tools."
           />
-        </HelmetProvider>
+        </Helmet>
         <div className="container mx-auto px-4 py-6 pb-28">
           {/* Header with Clock */}
           <motion.div
@@ -225,7 +225,7 @@ function App() {
                 color: 'var(--text2)',
               }}
             >
-              Productivity Scheduler
+              Kept
             </h1>
             <p
               style={{

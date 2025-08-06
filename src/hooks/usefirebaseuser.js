@@ -61,7 +61,7 @@ export default function useFirebaseUser() {
         setUser(null);
         setXp(0);
         setLevel(1);
-        setTheme('original');
+        //setTheme('original');
         setTasks([]);
         setLoadingUserData(false);
         setUserDataLoaded(false); // reset user data loaded

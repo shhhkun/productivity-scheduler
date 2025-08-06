@@ -1,7 +1,7 @@
-# Productivity App – Dev Log & Roadmap
+# Kept — A Minimalist Productivity Scheduler
 
 ## Overview
-A minimalistic productivity tracker featuring a gamified XP and ranking system. Designed with animations, intuitive UI, and motivational mechanics.
+**Kept** is a minimalist productivity scheduler that helps users plan their days with a simple time-block interface and motivational game elements. Track your streaks, earn XP, and stay organized — all with a sleek UI, animations, and Firebase-backed persistence.
 
 [**Live Demo**](https://productivityapp-eb15a.web.app/)
 

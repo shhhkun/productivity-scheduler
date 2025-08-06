@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -20,6 +20,7 @@ export default function AuthScreen({
 }) {
   const [step, setStep] = useState('email');
   const [showPassword, setShowPassword] = useState(false);
+  const [greeting, setGreeting] = useState('');
 
   const handleNext = () => {
     if (loginEmail.trim()) setStep('password');
@@ -30,17 +31,55 @@ export default function AuthScreen({
     setLoginPass('');
   };
 
+  const getLoginGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour < 5) return 'Burning the midnight oil?';
+    if (hour < 12) return 'Good morning. Let’s plan your day.';
+    if (hour < 17) return 'Good afternoon. Let’s get things organized.';
+    if (hour < 21) return 'Good evening. What’s left for today?';
+    return 'Late night hustle?';
+  };
+
+  useEffect(() => {
+    setGreeting(getLoginGreeting());
+  }, []);
+
   return (
     <Box
       sx={{
         minHeight: '100vh',
         backgroundColor: 'var(--bg)', // Dark blue background
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         p: 2,
       }}
     >
+      <Box
+        sx={{
+          textAlign: 'center',
+          mb: 2,
+          mt: 24,
+          width: '100%',
+          maxWidth: 420,
+          color: 'var(--text2)',
+        }}
+      >
+        <Typography variant="h4" fontWeight="bold">
+          Kept
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            color: 'var(--text3)',
+          }}
+        >
+          {greeting}
+        </Typography>
+      </Box>
+
       <Paper
         elevation={8}
         sx={{
@@ -117,7 +156,8 @@ export default function AuthScreen({
             <Button
               onClick={() => signUp(loginEmail, loginPass)}
               sx={{
-                color: 'var(--button-bg)',
+                color: 'var(--accent)',
+                backgroundColor: 'transparent',
                 textTransform: 'none',
                 fontSize: '0.875rem',
               }}
@@ -207,7 +247,7 @@ export default function AuthScreen({
             <Button
               onClick={() => signUp(loginEmail, loginPass)}
               sx={{
-                color: 'var(--button-bg)',
+                color: 'var(--accent)',
                 textTransform: 'none',
                 fontSize: '0.875rem',
               }}
