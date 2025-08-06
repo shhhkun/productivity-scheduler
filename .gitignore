@@ -3,5 +3,4 @@ dist/
 .env
 .DS_Store
 .vscode/
-src/firebase.js
 .firebase/
