@@ -1,9 +1,15 @@
-# Kept — A Minimalist Productivity Scheduler
+# Kept - A Minimalist Productivity Scheduler
 
 ## Overview
 **Kept** is a minimalist productivity scheduler that helps users plan their days with a simple time-block interface and motivational game elements. Track your streaks, earn XP, and stay organized — all with a sleek UI, animations, and Firebase-backed persistence.
 
 [**Live Demo**](https://productivityapp-eb15a.web.app/)
+
+![Login Screen](./screenshots/login.png)
+*Login screen with branding and greeting depending on the hour of the day.*
+
+![Main App](./screenshots/dashboard.png)
+*Daily schedule with XP, streak tracking, and confetti animations.*
 
 ---
 
@@ -16,14 +22,14 @@
 - Modal form to add new tasks
 - Initial animation logic (Framer Motion for layout transitions)
 
-### **v1.1 – Gamification System**
+### **v1.1 - Gamification System**
 - XP bar and level calculation
 - Streak counter component
 - XP & streak increment logic tied to task completion
 - UI polish for XP display
 - Refactored task state handlers for clarity
 
-### **v1.2 – Ranks & Debugging**
+### **v1.2 - Ranks & Debugging**
 - Sticky XP bar (includes rank/badges, level bar, and XP info)
 - Badge/achievement system
 - Debug menu (supports XP system)
