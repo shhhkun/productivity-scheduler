@@ -46,7 +46,7 @@
     - Quick nav
     - Highlights current week being viewed
 
-### *v1.4 - Firestore Database & User Authentication**
+### **v1.4 - Firestore Database & User Authentication**
 - Firebase integration
     - User sign-up/log-in with Firebase Authentication
     - Task and storage persistence with Firebase Database
@@ -54,7 +54,7 @@
 - General UI polish
 - Dark/light mode toggles
 
-### *v1.5 - Upcoming/Next**
+### **v1.5 - Upcoming/Next**
 - Fitness/workout plan sidebar
     - Can hold weekly workout split
     - Weight logger/tracker (with graph?)
